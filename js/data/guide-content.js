@@ -212,7 +212,106 @@ var GUIDE_CONTENT = {
     }
   ],
 
-  /* ── 4. 한국어 → 영어 대응표 ── */
+  /* ── 4. 프롬프트 모음 ── */
+  promptLibrary: [
+    {
+      id: 'atmosphere',
+      icon: '🌫️',
+      title: '분위기 & 대기',
+      items: [
+        { label: '볼류메트릭 안개', prompt: 'volumetric fog, atmospheric haze, god rays piercing through mist, soft depth cues' },
+        { label: '열기 아지랑이', prompt: 'heat haze shimmer, thermal distortion, wavering air above hot surface' },
+        { label: '먼지 & 파티클', prompt: 'floating dust particles, airborne debris, micro-particulates caught in light beams' },
+        { label: '연기 흐름', prompt: 'wispy smoke tendrils rising, dissipating vapor trails, layered smoke plumes' },
+        { label: '빗속 수증기', prompt: 'rain droplets, spray mist, wet surface reflections, water vapor in air' },
+        { label: '눈 내림', prompt: 'gently falling snowflakes, snow drift particles, winter air, frost patterns on surface' },
+        { label: '모래 & 먼지 폭풍', prompt: 'sand particles swirling, dust storm wall, gritty airborne debris, amber haze' }
+      ]
+    },
+    {
+      id: 'light',
+      icon: '✨',
+      title: '빛 & 발광',
+      items: [
+        { label: '아나모픽 렌즈 플레어', prompt: 'anamorphic lens flare, horizontal blue-tinted light streak, cinematic optical flare' },
+        { label: '고드레이 (빛 산란)', prompt: 'god rays, crepuscular rays, light shafts piercing through atmosphere, volumetric light beams' },
+        { label: '글로우 & 블룸', prompt: 'bloom effect, glowing overexposed highlights, soft light bloom around bright sources' },
+        { label: '네온 발광', prompt: 'neon glow, electric luminescence, vivid colored light emission, iridescent halo' },
+        { label: '에너지 오러', prompt: 'energy aura emanating, bioluminescent glow, magical luminescence radiating outward from subject' },
+        { label: '반사 & 리플렉션', prompt: 'wet ground reflections, mirror-like surface, specular highlights, chrome-like reflectivity' },
+        { label: '캐우스틱 (수면 반사광)', prompt: 'caustic light patterns, underwater light ripples, refracted light dancing on surface' }
+      ]
+    },
+    {
+      id: 'fire',
+      icon: '🔥',
+      title: '불 & 폭발',
+      items: [
+        { label: '화염', prompt: 'realistic fire simulation, dynamic flame with orange-red body and blue core, fire licking upward' },
+        { label: '대형 폭발', prompt: 'massive explosion, expanding fireball, shockwave ring, debris scatter, concentric pressure wave, dust curtain' },
+        { label: '불꽃 파티클', prompt: 'ember particles scattering, fire sparks drifting, glowing cinders floating upward in heat' },
+        { label: '연소 연기', prompt: 'thick black smoke billowing from fire, dark rolling combustion smoke, turbulent smoke clouds' },
+        { label: '작은 불씨 & 횃불', prompt: 'small flame flicker, torch fire, subtle flame detail, warm amber glow from nearby flame' },
+        { label: '용암 & 마그마', prompt: 'molten lava flow, glowing magma cracks, incandescent liquid rock, red-orange heat emission' }
+      ]
+    },
+    {
+      id: 'energy',
+      icon: '⚡',
+      title: '전기 & 에너지',
+      items: [
+        { label: '번개 & 전기 아크', prompt: 'electric lightning arc, plasma discharge, branching lightning bolts, high-voltage spark, crackling electricity' },
+        { label: '에너지 빔', prompt: 'concentrated energy beam, laser bolt, directional light ray, focused energy pulse traveling' },
+        { label: '플라즈마', prompt: 'plasma tendrils, ionized gas discharge, purple-white plasma orb, electric plasma wisps' },
+        { label: '충격파 & 압력파', prompt: 'expanding shockwave ring, pressure wave distortion, impact ripple moving outward, atmospheric concussion' },
+        { label: '홀로그램', prompt: 'translucent blue holographic projection, digital ghost image, scanline overlay, light-field display flicker' },
+        { label: '포털 & 워프', prompt: 'swirling portal vortex, space-time distortion, dimensional rift edge, event horizon distortion ring' }
+      ]
+    },
+    {
+      id: 'water',
+      icon: '💧',
+      title: '물 & 액체',
+      items: [
+        { label: '물 스플래시', prompt: 'water splash impact, droplets explosion, liquid crown shape, water droplets in slow motion' },
+        { label: '파도 & 해양', prompt: 'ocean wave crests, white foam breaking, churning water surface, spray off wave top' },
+        { label: '빗속 & 빗물', prompt: 'heavy rainfall streaks, puddle ripple rings, rain-soaked reflective surface, water running down glass' },
+        { label: '흐르는 물', prompt: 'flowing water stream, river current turbulence, water cascading over rocks, liquid flow simulation' },
+        { label: '수증기 & 김', prompt: 'steam rising from surface, vapor clouds, hot spring mist curling upward, condensation wisps' },
+        { label: '빙하 & 얼음', prompt: 'ice crystal formation, frost spreading, glacial surface, translucent ice with internal cracks and bubbles' }
+      ]
+    },
+    {
+      id: 'composition',
+      icon: '🎞️',
+      title: '컴포지션 & 레이어',
+      items: [
+        { label: '전경 레이어', prompt: 'out-of-focus foreground elements, near-field bokeh, blurred leaves or debris in extreme foreground' },
+        { label: '전경-중경-배경 분리', prompt: 'distinct foreground midground background separation, depth layering, three-plane composition' },
+        { label: '얕은 피사계 심도', prompt: 'shallow depth of field, selective focus on subject, smooth creamy bokeh background, f/1.4 aperture look' },
+        { label: '대기 원근 (거리감)', prompt: 'atmospheric perspective, aerial haze at distance, far objects desaturated and blue-shifted, depth fog layers' },
+        { label: '프레임 인 프레임', prompt: 'natural framing with foreground arch or window, frame within frame composition, environmental framing element' },
+        { label: '대칭 & 반영', prompt: 'perfect symmetrical composition, reflective surface doubling scene, mirror axis alignment' },
+        { label: '실루엣 컷', prompt: 'strong silhouette against bright background, rim lighting only, figure as dark shape against glowing sky' }
+      ]
+    },
+    {
+      id: 'transition',
+      icon: '🔄',
+      title: '트랜지션 & 카메라 무브',
+      items: [
+        { label: '드론 서서히 상승', prompt: 'drone slowly ascending, camera rising from ground level revealing landscape, aerial lift-off' },
+        { label: '스피드 램프', prompt: 'speed ramp transitioning from extreme slow-motion to full speed, velocity shift, dynamic tempo change' },
+        { label: '360도 오빗', prompt: '360-degree orbit shot around subject, slow circular tracking, camera revolving around central figure' },
+        { label: '달리 줌 (버티고)', prompt: 'dolly zoom effect, subject stays same size while background shifts, Hitchcock zoom, vertigo effect' },
+        { label: '풀백 리빌', prompt: 'slow pull-back reveal, camera retreating to show wider context, gradual scene expansion' },
+        { label: '핸드헬드 팔로우', prompt: 'handheld camera following subject, slight organic shake, documentary-style tracking, immersive follow cam' },
+        { label: '모션 블러 전환', prompt: 'directional motion blur whip pan transition, fast lateral smear, speed-cut transition effect' }
+      ]
+    }
+  ],
+
+  /* ── 5. 한국어 → 영어 대응표 ── */
   lookup: [
     /* 분위기/무드 */
     { ko: '어둡고 무거운', en: 'dark and moody', tip: '드라마틱한 장면, 스릴러' },
