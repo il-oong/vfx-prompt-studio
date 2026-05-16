@@ -155,6 +155,112 @@ var VFXGuide = (function() {
     });
   }
 
+  /* ── 카메라 무브 빌더 ── */
+  function renderCameraBuilderHTML() {
+    var cats = GUIDE_CONTENT.cameraBuilder;
+    var catHTML = cats.map(function(cat) {
+      var opts = cat.options.map(function(opt) {
+        return '<button class="camb-opt" data-cat="' + cat.id + '" data-prompt="' + escHtml(opt.prompt) + '">' + escHtml(opt.label) + '</button>';
+      }).join('');
+      return '<div class="camb-cat">' +
+        '<div class="camb-cat-label">' + escHtml(cat.label) + (cat.multi ? '<span class="camb-multi-badge">복수 선택</span>' : '') + '</div>' +
+        '<div class="camb-opts">' + opts + '</div>' +
+      '</div>';
+    }).join('');
+
+    return '<div class="camb-header">' +
+        '<div>' +
+          '<h3 class="plib-section-title">카메라 무브 빌더</h3>' +
+          '<p class="plib-section-sub">원하는 요소를 클릭해서 조합하세요. 자동으로 프롬프트가 완성됩니다. (복수 선택 가능한 항목은 배지 표시)</p>' +
+        '</div>' +
+        '<button class="btn-ghost camb-reset-btn" id="camb-reset">초기화</button>' +
+      '</div>' +
+      '<div class="camb-categories">' + catHTML + '</div>' +
+      '<div class="camb-result" id="camb-result">' +
+        '<div class="camb-result-label">생성된 프롬프트</div>' +
+        '<div class="camb-result-text" id="camb-result-text">위에서 요소를 선택하면 프롬프트가 여기에 표시됩니다.</div>' +
+        '<div class="camb-result-actions">' +
+          '<button class="btn-primary camb-copy-btn" id="camb-copy">⎘ 복사</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  var cambSelected = {};
+
+  function initCameraBuilder() {
+    GUIDE_CONTENT.cameraBuilder.forEach(function(cat) {
+      cambSelected[cat.id] = [];
+    });
+
+    document.querySelectorAll('.camb-opt').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var cat = btn.dataset.cat;
+        var catDef = GUIDE_CONTENT.cameraBuilder.find(function(c) { return c.id === cat; });
+        var prompt = btn.dataset.prompt;
+
+        if (catDef.multi) {
+          var idx = cambSelected[cat].indexOf(prompt);
+          if (idx === -1) {
+            cambSelected[cat].push(prompt);
+            btn.classList.add('active');
+          } else {
+            cambSelected[cat].splice(idx, 1);
+            btn.classList.remove('active');
+          }
+        } else {
+          document.querySelectorAll('.camb-opt[data-cat="' + cat + '"]').forEach(function(b) {
+            b.classList.remove('active');
+          });
+          if (cambSelected[cat][0] === prompt) {
+            cambSelected[cat] = [];
+          } else {
+            cambSelected[cat] = [prompt];
+            btn.classList.add('active');
+          }
+        }
+
+        updateCambResult();
+      });
+    });
+
+    document.getElementById('camb-reset').addEventListener('click', function() {
+      GUIDE_CONTENT.cameraBuilder.forEach(function(cat) {
+        cambSelected[cat.id] = [];
+      });
+      document.querySelectorAll('.camb-opt').forEach(function(b) { b.classList.remove('active'); });
+      updateCambResult();
+    });
+
+    document.getElementById('camb-copy').addEventListener('click', function() {
+      var text = document.getElementById('camb-result-text').textContent;
+      var empty = '위에서 요소를 선택하면 프롬프트가 여기에 표시됩니다.';
+      if (text === empty) { showToast('선택된 요소가 없습니다.'); return; }
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('카메라 무브 프롬프트를 복사했습니다.');
+      });
+    });
+  }
+
+  function updateCambResult() {
+    var parts = [];
+    GUIDE_CONTENT.cameraBuilder.forEach(function(cat) {
+      var sel = cambSelected[cat.id];
+      if (sel && sel.length) {
+        sel.forEach(function(p) { parts.push(p); });
+      }
+    });
+
+    var el = document.getElementById('camb-result-text');
+    var resultBox = document.getElementById('camb-result');
+    if (!parts.length) {
+      el.textContent = '위에서 요소를 선택하면 프롬프트가 여기에 표시됩니다.';
+      resultBox.classList.remove('has-result');
+    } else {
+      el.textContent = parts.join(', ');
+      resultBox.classList.add('has-result');
+    }
+  }
+
   /* ── 프롬프트 모음 ── */
   var MASTER_KEY = 'vfx_master_prompts';
 
@@ -169,6 +275,9 @@ var VFXGuide = (function() {
     var container = document.getElementById('guide-prompts-lib');
 
     container.innerHTML =
+      '<div class="camb-section">' +
+        renderCameraBuilderHTML() +
+      '</div>' +
       '<div class="plib-master-section">' +
         '<div class="plib-master-header">' +
           '<div>' +
@@ -205,6 +314,7 @@ var VFXGuide = (function() {
 
     renderMasterList();
     renderPresetList();
+    initCameraBuilder();
 
     document.getElementById('plib-add-master').addEventListener('click', function() {
       openMasterModal(null);

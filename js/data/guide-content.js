@@ -212,7 +212,90 @@ var GUIDE_CONTENT = {
     }
   ],
 
-  /* ── 4. 프롬프트 모음 ── */
+  /* ── 4. 카메라 무브 빌더 ── */
+  cameraBuilder: [
+    {
+      id: 'height',
+      label: '📏 카메라 높이',
+      multi: false,
+      options: [
+        { label: '지면 레벨', prompt: 'ground level, worm\'s eye perspective' },
+        { label: '눈높이', prompt: 'eye-level shot' },
+        { label: '하이앵글', prompt: 'high angle looking down' },
+        { label: '버드아이뷰', prompt: 'bird\'s eye view, overhead' },
+        { label: '드론 고도', prompt: 'aerial drone altitude, high above ground' }
+      ]
+    },
+    {
+      id: 'start',
+      label: '🎯 시작 위치',
+      multi: false,
+      options: [
+        { label: '왼쪽', prompt: 'starting from the left side of subject' },
+        { label: '가운데', prompt: 'starting from center, directly facing subject' },
+        { label: '오른쪽', prompt: 'starting from the right side of subject' },
+        { label: '피사체 뒤', prompt: 'starting from behind subject' },
+        { label: '피사체 앞', prompt: 'starting from in front of subject' }
+      ]
+    },
+    {
+      id: 'move',
+      label: '➡️ 이동 방식',
+      multi: true,
+      options: [
+        { label: '왼쪽 팬', prompt: 'panning left' },
+        { label: '오른쪽 팬', prompt: 'panning right' },
+        { label: '틸트 업', prompt: 'tilting up' },
+        { label: '틸트 다운', prompt: 'tilting down' },
+        { label: '달리인 (전진)', prompt: 'dolly in, pushing toward subject' },
+        { label: '풀백 (후퇴)', prompt: 'pulling back away from subject' },
+        { label: '시계방향 오빗', prompt: 'orbiting clockwise around subject' },
+        { label: '반시계 오빗', prompt: 'orbiting counter-clockwise around subject' },
+        { label: '상승', prompt: 'camera rising upward, crane up' },
+        { label: '하강', prompt: 'camera descending, crane down' },
+        { label: '달리줌 (버티고)', prompt: 'dolly zoom, background shifting while subject stays' }
+      ]
+    },
+    {
+      id: 'end',
+      label: '🏁 끝 위치',
+      multi: false,
+      options: [
+        { label: '가운데 정착', prompt: 'settling at center frame' },
+        { label: '피사체 클로즈업', prompt: 'ending in close-up on subject' },
+        { label: '왼쪽', prompt: 'ending framed left' },
+        { label: '오른쪽', prompt: 'ending framed right' },
+        { label: '와이드샷 리빌', prompt: 'pulling back to reveal wide establishing shot' },
+        { label: '피사체 뒤', prompt: 'ending behind subject, over-shoulder view' }
+      ]
+    },
+    {
+      id: 'speed',
+      label: '⏱ 속도',
+      multi: false,
+      options: [
+        { label: '아주 느리게', prompt: 'imperceptibly slow, barely perceptible motion' },
+        { label: '느리게', prompt: 'slow and deliberate' },
+        { label: '보통', prompt: 'steady pace' },
+        { label: '빠르게', prompt: 'swift and dynamic' },
+        { label: '스피드 램프', prompt: 'speed ramping, transitioning from slow to fast motion' }
+      ]
+    },
+    {
+      id: 'feel',
+      label: '🎥 장비 느낌',
+      multi: false,
+      options: [
+        { label: '스테디캠', prompt: 'smooth steadicam, fluid stabilized motion' },
+        { label: '핸드헬드', prompt: 'handheld, slight organic shake' },
+        { label: '드론', prompt: 'cinematic drone, aerial vehicle movement' },
+        { label: '크레인 / 짐벌', prompt: 'crane or jib arm movement' },
+        { label: '슬라이더', prompt: 'camera slider, linear lateral motion' }
+      ]
+    }
+  ],
+
+  /* ── 5. 프롬프트 모음 ── */
   promptLibrary: [
     {
       id: 'atmosphere',

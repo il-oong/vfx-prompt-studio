@@ -251,6 +251,130 @@
 
 .lookup-row-hidden { display: none; }
 
+/* ── 카메라 무브 빌더 ── */
+.camb-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.camb-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.camb-reset-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.camb-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.camb-cat {}
+
+.camb-cat-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.camb-multi-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--primary-dim);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.camb-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.camb-opt {
+  padding: 5px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.camb-opt:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-dim);
+}
+.camb-opt.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.camb-result {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.camb-result.has-result {
+  border-color: var(--primary);
+  background: var(--primary-dim);
+}
+
+.camb-result-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.camb-result-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  word-break: break-word;
+  min-height: 22px;
+  margin-bottom: 12px;
+}
+.camb-result.has-result .camb-result-text {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.camb-result-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.camb-copy-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+}
+
 /* ── 프롬프트 모음 탭 ── */
 .plib-master-section {
   background: var(--surface);
