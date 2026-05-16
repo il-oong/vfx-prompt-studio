@@ -296,9 +296,64 @@ var GUIDE_CONTENT = {
       ]
     },
     {
+      id: 'cut',
+      icon: '✂️',
+      title: '영상 전환 효과 (편집 트랜지션)',
+      items: [
+        { label: '하드컷', prompt: 'hard cut, abrupt scene change, instantaneous cut to next shot, no transition' },
+        { label: '스매시컷', prompt: 'smash cut, sudden jarring cut to contrasting scene, impact cut for comedic or dramatic effect' },
+        { label: '디졸브', prompt: 'cross dissolve transition, scenes blending together, soft fade overlap between two shots' },
+        { label: '페이드 인 / 아웃', prompt: 'fade from black, gradual exposure increase from darkness, fade to black at end of scene' },
+        { label: '매치컷', prompt: 'match cut, visual continuity between two scenes sharing shape or motion, graphic match edit' },
+        { label: '점프컷', prompt: 'jump cut, temporal ellipsis, same subject slightly repositioned between cuts, time skip effect' },
+        { label: 'J컷 / L컷', prompt: 'L-cut audio overlap, previous scene audio continues over new visual, smooth narrative transition' },
+        { label: '와이프 트랜지션', prompt: 'wipe transition, new scene sweeping across frame edge, directional wipe left to right' },
+        { label: '화면 분할 (스플릿)', prompt: 'split screen, two simultaneous scenes side by side, dual frame composition, parallel action' },
+        { label: '아이리스 전환', prompt: 'iris in / iris out transition, circular vignette closing or opening to reveal new scene, classic film transition' }
+      ]
+    },
+    {
+      id: 'colorgrade',
+      icon: '🎨',
+      title: '필터 & 색감 (컬러 그레이딩)',
+      items: [
+        { label: '틸 & 오렌지 (할리우드)', prompt: 'teal and orange color grade, cool shadows with warm highlights, Hollywood blockbuster look, complementary contrast' },
+        { label: '블리치 바이패스 (색 탈색)', prompt: 'bleach bypass look, desaturated shadows, crushed blacks, high contrast silver retention, gritty film appearance' },
+        { label: '느와르 흑백', prompt: 'black and white film noir grade, high contrast monochrome, deep shadows, bright specular highlights, no color' },
+        { label: '빈티지 필름', prompt: 'vintage film look, faded colors, lifted blacks, warm yellow-orange cast, film grain texture, 70s aesthetic' },
+        { label: '차가운 블루 톤', prompt: 'cold blue color grade, desaturated, steel blue shadows, cool clinical tone, sterile atmosphere' },
+        { label: '따뜻한 골든 톤', prompt: 'warm golden color grade, amber highlights, rich warm shadows, honeyed tones, nostalgic warmth' },
+        { label: '사이버펑크 네온', prompt: 'cyberpunk color grade, vivid magenta and cyan neons, high saturation, dark midtones, electric hue contrast' },
+        { label: '오렌지 & 그린 (공포)', prompt: 'horror green tint grade, sickly green shadows, pallid skin tones, unsettling desaturated cast' },
+        { label: '과노출 & 화이트아웃', prompt: 'overexposed dreamy look, blown-out highlights, soft halation, ethereal white glow, overlit romantic tone' },
+        { label: '크로스 프로세싱', prompt: 'cross-processed color, unexpected hue shifts, shifted color channels, experimental lo-fi film look' },
+        { label: '듀오톤 (두 색상)', prompt: 'duotone color effect, image rendered in two contrasting hues, graphic poster-like color treatment' },
+        { label: '인프라레드 룩', prompt: 'infrared photography look, foliage glowing white, inverted tones, surreal color shift, dreamy otherworldly feel' }
+      ]
+    },
+    {
+      id: 'framing',
+      icon: '📐',
+      title: '구도 & 프레이밍',
+      items: [
+        { label: '삼분할 법칙', prompt: 'rule of thirds composition, subject placed at intersection of thirds grid, balanced asymmetric framing' },
+        { label: '황금 비율 나선', prompt: 'golden ratio spiral composition, Fibonacci spiral framing, subject at center of logarithmic spiral' },
+        { label: '리딩 라인', prompt: 'leading lines drawing eye toward subject, converging perspective lines, road or path guiding gaze' },
+        { label: '네거티브 스페이스', prompt: 'generous negative space, subject isolated in large empty area, minimalist breathing room composition' },
+        { label: '중앙 대칭', prompt: 'centered symmetrical composition, perfectly mirrored frame, Wes Anderson style centered framing' },
+        { label: '프레임 인 프레임', prompt: 'frame within a frame, subject viewed through doorway arch or window, natural environmental framing' },
+        { label: '전경 클로즈업 오버랩', prompt: 'extreme foreground element overlapping subject, layered depth, blurred object in tight foreground corner' },
+        { label: '대각선 구도', prompt: 'diagonal composition, dynamic lines running corner to corner, energetic tilted framing, tension through angles' },
+        { label: '로우앵글 위압감', prompt: 'low angle upward shot, worm eye view, subject towering over camera, dominant imposing perspective' },
+        { label: '하이앵글 조감', prompt: "high angle bird's eye looking down, overhead perspective, subject small against large ground plane" },
+        { label: '깊이감 레이어링', prompt: 'depth layering foreground midground background, strong spatial separation, three-dimensional frame depth' },
+        { label: '익스트림 와이드 고독감', prompt: 'extreme wide shot isolating tiny subject in vast environment, sense of solitude and scale, epic landscape dwarfing figure' }
+      ]
+    },
+    {
       id: 'transition',
       icon: '🔄',
-      title: '트랜지션 & 카메라 무브',
+      title: '카메라 무브 트랜지션',
       items: [
         { label: '드론 서서히 상승', prompt: 'drone slowly ascending, camera rising from ground level revealing landscape, aerial lift-off' },
         { label: '스피드 램프', prompt: 'speed ramp transitioning from extreme slow-motion to full speed, velocity shift, dynamic tempo change' },
