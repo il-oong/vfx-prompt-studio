@@ -1,0 +1,252 @@
+/* ── 가이드 탭 ── */
+#guide-panel {
+  padding: 24px;
+}
+
+.guide-subtabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: var(--surface);
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.guide-subtab-btn {
+  padding: 7px 16px;
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius);
+}
+.guide-subtab-btn:hover { background: var(--surface3); color: var(--text); }
+.guide-subtab-btn.active { background: var(--primary); color: #fff; }
+.guide-subtab-btn:active { transform: none; }
+
+.guide-section { display: none; }
+.guide-section.active { display: block; }
+
+/* 워크플로우 */
+.workflow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workflow-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+.workflow-step:hover { border-color: var(--border-light); }
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  background: var(--primary-dim);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.step-body p { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 8px; }
+.step-tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.step-tool-tag {
+  padding: 2px 8px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.workflow-arrow {
+  text-align: center;
+  color: var(--text3);
+  font-size: 16px;
+  padding: 4px 0;
+}
+
+/* 도구 비교 */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  transition: border-color 0.15s;
+}
+.tool-card:hover { border-color: var(--border-light); }
+
+.tool-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.tool-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.tool-card h4 { font-size: 14px; font-weight: 700; }
+.tool-card .tool-type {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+
+.tool-card p { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
+
+.tool-strengths { display: flex; flex-wrap: wrap; gap: 4px; }
+.strength-tag {
+  padding: 2px 7px;
+  background: rgba(139,92,246,0.1);
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--primary);
+}
+
+/* 용어집 */
+.glossary-sections { display: flex; flex-direction: column; gap: 8px; }
+
+.glossary-accordion {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.glossary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.glossary-header:hover { background: var(--surface2); }
+
+.glossary-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.glossary-cat-icon {
+  width: 30px;
+  height: 30px;
+  background: var(--primary-dim);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.glossary-header h4 { font-size: 13px; font-weight: 700; }
+.glossary-header p { font-size: 12px; color: var(--text2); }
+.glossary-arrow {
+  color: var(--text3);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.glossary-accordion.open .glossary-arrow { transform: rotate(180deg); }
+
+.glossary-body {
+  display: none;
+  border-top: 1px solid var(--border);
+}
+.glossary-accordion.open .glossary-body { display: block; }
+
+.glossary-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--border);
+}
+.glossary-term {
+  background: var(--surface);
+  padding: 12px 16px;
+}
+.glossary-term .en { font-size: 13px; font-weight: 600; color: var(--primary); }
+.glossary-term .ko { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.glossary-term .desc { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+
+/* 한영 대응표 */
+.lookup-search {
+  position: relative;
+  margin-bottom: 16px;
+}
+.lookup-search input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+}
+.lookup-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 14px;
+}
+
+.lookup-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.lookup-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lookup-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.lookup-table td {
+  padding: 10px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.lookup-table tr:last-child td { border-bottom: none; }
+.lookup-table tr:hover td { background: var(--surface2); }
+.lookup-table td:nth-child(1) { color: var(--text2); }
+.lookup-table td:nth-child(2) { font-weight: 600; color: var(--primary); }
+.lookup-table td:nth-child(3) { color: var(--text3); font-size: 12px; }
+
+.lookup-row-hidden { display: none; }

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VFX Prompt Studio</title>
+
+  <!-- 한국어 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- 스타일 -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/guide.css">
+  <link rel="stylesheet" href="css/archive.css">
+  <link rel="stylesheet" href="css/prompts.css">
+  <link rel="stylesheet" href="css/bot.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ─── 헤더 ─── -->
+  <header id="header">
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      VFX Prompt Studio
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-settings" title="설정">⚙</button>
+    </div>
+  </header>
+
+  <!-- ─── 탭 네비게이션 ─── -->
+  <nav id="tabs">
+    <button class="tab-btn active" data-tab="guide">📖 가이드</button>
+    <button class="tab-btn" data-tab="archive">🗂 아카이브</button>
+    <button class="tab-btn" data-tab="prompts">📋 프롬프트</button>
+  </nav>
+
+  <!-- ─── 탭 콘텐츠 ─── -->
+  <main id="tab-content">
+
+    <!-- ══════════════════════════
+         가이드 탭
+    ══════════════════════════ -->
+    <section id="guide-panel" class="tab-panel active">
+      <!-- 서브탭 -->
+      <div class="guide-subtabs">
+        <button class="guide-subtab-btn active" data-tab="workflow">워크플로우</button>
+        <button class="guide-subtab-btn" data-tab="tools">도구 비교</button>
+        <button class="guide-subtab-btn" data-tab="glossary">용어집</button>
+        <button class="guide-subtab-btn" data-tab="lookup">한→영 대응표</button>
+      </div>
+
+      <!-- 워크플로우 -->
+      <div id="guide-workflow" class="guide-section active"></div>
+
+      <!-- 도구 비교 -->
+      <div id="guide-tools" class="guide-section"></div>
+
+      <!-- 용어집 -->
+      <div id="guide-glossary" class="guide-section"></div>
+
+      <!-- 한영 대응표 -->
+      <div id="guide-lookup" class="guide-section"></div>
+    </section>
+
+    <!-- ══════════════════════════
+         아카이브 탭
+    ══════════════════════════ -->
+    <section id="archive-panel" class="tab-panel">
+
+      <!-- 사이드바: 프로젝트 목록 -->
+      <aside class="archive-sidebar">
+        <div class="sidebar-header">
+          <h3>프로젝트</h3>
+          <button class="btn-new-project" id="btn-new-project">+ 새 프로젝트</button>
+        </div>
+        <div class="project-list" id="project-list"></div>
+      </aside>
+
+      <!-- 메인 영역 -->
+      <div class="archive-main">
+        <!-- 툴바 -->
+        <div class="archive-toolbar">
+          <div class="archive-toolbar-left">
+            <div>
+              <div class="archive-project-title" id="archive-project-title">프로젝트 선택</div>
+              <div class="archive-project-desc" id="archive-project-desc"></div>
+            </div>
+          </div>
+          <div class="archive-toolbar-right">
+            <button class="btn-secondary" id="btn-connect-folder" style="display:flex;align-items:center;gap:5px;font-size:12px">
+              📂 폴더 연결
+            </button>
+            <button class="btn-ghost icon-btn" id="btn-toggle-tree" title="폴더 트리 토글">🌲</button>
+          </div>
+        </div>
+
+        <!-- 파일 타입 필터 -->
+        <div class="filter-chips">
+          <button class="filter-chip active" data-filter="all" id="archive-filter-all">전체</button>
+          <button class="filter-chip" data-filter="image" id="archive-filter-images">🖼️ 이미지</button>
+          <button class="filter-chip" data-filter="video" id="archive-filter-videos">🎬 영상</button>
+        </div>
+
+        <!-- 파일 콘텐츠 영역 -->
+        <div id="archive-content" style="flex:1;overflow-y:auto;display:flex;flex-direction:column"></div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════
+         프롬프트 탭
+    ══════════════════════════ -->
+    <section id="prompts-panel" class="tab-panel">
+
+      <!-- 툴바 & 필터 -->
+      <div class="prompts-toolbar">
+        <div class="prompts-search">
+          <span class="prompts-search-icon">🔍</span>
+          <input type="text" id="prompts-search" placeholder="제목, 내용, 태그 검색...">
+        </div>
+        <select class="filter-select" id="prompts-filter-project">
+          <option value="all">전체 프로젝트</option>
+        </select>
+        <select class="filter-select" id="prompts-filter-tool">
+          <option value="all">전체 툴</option>
+          <option value="Runway">Runway</option>
+          <option value="Kling">Kling</option>
+          <option value="Hailuo">Hailuo</option>
+          <option value="Midjourney">Midjourney</option>
+          <option value="Flux">Flux</option>
+          <option value="Sora">Sora</option>
+          <option value="Veo 3">Veo 3</option>
+          <option value="Wan">Wan</option>
+        </select>
+        <select class="filter-select" id="prompts-filter-category">
+          <option value="all">전체 카테고리</option>
+          <option value="scene">장면</option>
+          <option value="asset">에셋</option>
+          <option value="character">캐릭터</option>
+          <option value="bg">배경</option>
+          <option value="fx">FX</option>
+        </select>
+        <button class="btn-primary" id="btn-new-prompt" style="display:flex;align-items:center;gap:5px;white-space:nowrap">
+          + 추가
+        </button>
+      </div>
+
+      <!-- 프롬프트 목록 -->
+      <div class="prompts-content">
+        <div id="prompts-list"></div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- ─── AI 봇 ─── -->
+<button id="bot-toggle" title="AI 프롬프트 변환">✦</button>
+
+<div id="bot-panel" class="hidden">
+  <div class="bot-header">
+    <div class="bot-header-left">
+      <div class="bot-avatar">✦</div>
+      <div>
+        <div class="bot-title">AI 프롬프트 변환</div>
+        <div class="bot-subtitle">한국어 → VFX 영어 프롬프트</div>
+      </div>
+    </div>
+    <div class="bot-header-actions">
+      <button class="icon-btn" id="bot-clear" title="대화 지우기" style="font-size:12px">🗑</button>
+      <button class="icon-btn" id="bot-close" title="닫기">✕</button>
+    </div>
+  </div>
+
+  <div class="bot-tool-row">
+    <label>툴</label>
+    <select id="bot-tool-select" class="bot-tool-select">
+      <option value="Runway">Runway Gen-4</option>
+      <option value="Kling">Kling AI</option>
+      <option value="Hailuo">Hailuo AI</option>
+      <option value="Midjourney">Midjourney</option>
+      <option value="Flux">Flux</option>
+      <option value="Sora">Sora</option>
+      <option value="Veo 3">Veo 3</option>
+      <option value="Wan">Wan</option>
+    </select>
+  </div>
+
+  <div class="bot-messages" id="bot-messages">
+    <!-- 환영 메시지 -->
+    <div class="bot-welcome" id="bot-welcome">
+      <div class="welcome-icon">✦</div>
+      <h4>VFX 프롬프트 변환 AI</h4>
+      <p>만들고 싶은 장면을 한국어로 설명해주세요.<br>선택한 AI 툴에 최적화된 영어 프롬프트로 변환해 드립니다.</p>
+      <div class="bot-example-prompts">
+        <button class="bot-example-btn" data-prompt="야간 도심 드론샷, 빗속에서 차들이 달리는 장면, 영화적으로">야간 도심 드론샷, 빗속 차량</button>
+        <button class="bot-example-btn" data-prompt="우주공간에서 우주인이 천천히 떠다니는 장면, 지구를 배경으로">우주인이 지구 배경으로 떠다니는 장면</button>
+        <button class="bot-example-btn" data-prompt="숲속에서 안개가 피어오르는 새벽, 빛이 나무 사이로 쏟아지는 장면">숲속 새벽 안개와 빛의 장면</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bot-input-row">
+    <textarea
+      id="bot-input"
+      class="bot-input"
+      placeholder="만들고 싶은 장면을 한국어로 설명..."
+      rows="1"
+    ></textarea>
+    <button id="bot-send-btn" class="bot-send-btn" title="전송">↑</button>
+  </div>
+</div>
+
+<!-- ─── 토스트 컨테이너 ─── -->
+<div id="toast-container"></div>
+
+<!-- ─── 스크립트 (순서 중요) ─── -->
+<script src="js/data/guide-content.js"></script>
+<script src="js/data/tool-presets.js"></script>
+<script src="js/db.js"></script>
+<script src="js/tab-guide.js"></script>
+<script src="js/tab-archive.js"></script>
+<script src="js/tab-prompts.js"></script>
+<script src="js/bot.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
