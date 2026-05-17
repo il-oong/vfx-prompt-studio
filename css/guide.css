@@ -1,0 +1,137 @@
+/* ───────────────────────────────────────────────────────────────
+   guide.css
+   ─────────────────────────────────────────────────────────────── */
+
+.g-section { margin-top: 40px; }
+.g-section-head { margin-bottom: 16px; }
+.g-section-title {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: 28px; margin: 4px 0 0; letter-spacing: -0.2px;
+}
+
+/* Workflow */
+.g-flow {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+}
+.g-flow-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-14); padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 8px;
+  border-left-width: 3px;
+}
+.g-flow-card--accent  { border-left-color: var(--accent); }
+.g-flow-card--amber   { border-left-color: var(--amber); }
+.g-flow-card--emerald { border-left-color: var(--emerald); }
+.g-flow-card--pink    { border-left-color: var(--pink); }
+
+.g-flow-step {
+  display: flex; align-items: center; gap: 6px;
+}
+.g-flow-num {
+  font-family: var(--font-serif); font-style: italic; font-weight: 600;
+  font-size: 24px; color: var(--text);
+}
+.g-flow-arrow {
+  font-family: var(--font-mono); font-size: 11px; color: var(--dim);
+}
+.g-flow-name {
+  margin: 0; font-size: 18px; font-weight: 700; color: var(--text);
+}
+.g-flow-tools {
+  font-family: var(--font-mono); font-size: 11px; color: var(--accent);
+  letter-spacing: 0.5px;
+}
+.g-flow-body {
+  margin: 4px 0 0; font-size: 13px; line-height: 1.6; color: var(--body);
+}
+
+/* Tools comparison */
+.g-tools {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-14); overflow: hidden;
+}
+.g-tools-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 80px 110px 110px;
+  padding: 12px 18px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.g-tools-row:last-child { border-bottom: 0; }
+.g-tools-head {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--panel);
+}
+.g-tools-name { font-weight: 700; color: var(--text); }
+.g-tools-best { color: var(--body); }
+.g-tools-dur  { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.g-stars {
+  color: var(--amber); font-size: 13px; letter-spacing: 1px;
+}
+.g-star-off { color: var(--border-hi); }
+
+/* Glossary */
+.g-glossary-search { margin-bottom: 14px; }
+.g-glossary { display: flex; flex-direction: column; gap: 18px; }
+.g-glossary-group-title {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--accent); letter-spacing: 2px; text-transform: uppercase;
+  margin: 0 0 8px;
+}
+.g-glossary-list {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-12); overflow: hidden;
+}
+.g-glossary-row {
+  display: grid;
+  grid-template-columns: 1fr 28px 1.4fr;
+  padding: 11px 18px;
+  font-size: 13px; align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.g-glossary-row:last-child { border-bottom: 0; }
+.g-glossary-ko { color: var(--body); }
+.g-glossary-arrow {
+  font-family: var(--font-mono); font-size: 11px; color: var(--dim);
+  text-align: center;
+}
+.g-glossary-en {
+  font-family: var(--font-mono); font-size: 12.5px;
+  color: var(--accent);
+}
+
+/* Tips */
+.g-tips { display: flex; flex-direction: column; gap: 10px; }
+.g-tip-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-14); padding: 16px 20px;
+  display: flex; gap: 14px; align-items: flex-start;
+  border-left-width: 3px;
+}
+.g-tip-card--accent  { border-left-color: var(--accent); }
+.g-tip-card--amber   { border-left-color: var(--amber); }
+.g-tip-card--emerald { border-left-color: var(--emerald); }
+.g-tip-card--pink    { border-left-color: var(--pink); }
+.g-tip-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--panel); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex: 0 0 32px;
+}
+.g-tip-content { flex: 1; min-width: 0; }
+.g-tip-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin: 0 0 6px; letter-spacing: -0.1px;
+}
+.g-tip-body {
+  font-size: 13px; line-height: 1.65; color: var(--body);
+  white-space: pre-line; margin: 0;
+}
+
+@media (max-width: 700px) {
+  .g-flow { grid-template-columns: 1fr; }
+  .g-tools-row { grid-template-columns: 1fr; gap: 4px; }
+  .g-tools-head { display: none; }
+  .g-tip-card { flex-direction: column; gap: 8px; }
+}

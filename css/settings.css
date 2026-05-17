@@ -1,0 +1,22 @@
+/* ───────────────────────────────────────────────────────────────
+   Settings section styles (lives next to main.css)
+   Append to main.css equivalent — kept inline here for clarity.
+   ─────────────────────────────────────────────────────────────── */
+.settings-section { display: flex; flex-direction: column; gap: 8px; }
+.settings-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.settings-section h3 {
+  margin: 0;
+  font-size: 14px; font-weight: 700;
+  color: var(--text); letter-spacing: -0.1px;
+}
+.settings-section code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--panel);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text);
+}

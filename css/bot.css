@@ -1,0 +1,146 @@
+/* ───────────────────────────────────────────────────────────────
+   bot.css — Studio tab (home / conversation)
+   ─────────────────────────────────────────────────────────────── */
+
+.bot-shell {
+  display: flex; flex-direction: column;
+  height: 100%;
+}
+.bot-scroll {
+  flex: 1; overflow: auto;
+}
+.bot-inner {
+  max-width: 760px; margin: 0 auto;
+  padding: 36px 40px 36px;
+}
+.bot-empty { padding-top: 36px; }
+.bot-empty .hero { margin-bottom: 6px; }
+
+.bot-suggest { margin-top: 32px; }
+.bot-suggest .eyebrow { margin-bottom: 10px; display: block; }
+.bot-suggest-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.bot-suggest .chip { background: var(--surface); }
+
+/* Conversation */
+.bot-feed {
+  display: flex; flex-direction: column; gap: 24px;
+  padding-bottom: 12px;
+}
+.msg {
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex: 0 0 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.msg-avatar--user {
+  background: var(--pink-bg); color: var(--pink);
+}
+.msg-avatar--bot {
+  background: linear-gradient(135deg, var(--accent), var(--amber));
+}
+
+.msg-body { flex: 1; min-width: 0; }
+.msg-meta {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px; font-weight: 700; color: var(--text);
+}
+.msg-time {
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--muted); font-weight: 400; letter-spacing: 0.3px;
+}
+.msg-text {
+  font-size: 14px; line-height: 1.6; color: var(--body);
+  white-space: pre-wrap;
+}
+.msg-prompt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-12);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px; line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+}
+.msg-prompt--error {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+  font-family: var(--font-sans);
+}
+.msg-actions {
+  display: flex; gap: 6px; margin-top: 10px;
+}
+
+/* Pending dots */
+.msg-pending {
+  display: inline-flex; gap: 5px; padding: 14px 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-12);
+}
+.msg-pending span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  animation: dot 1s var(--ease-out) infinite;
+}
+.msg-pending span:nth-child(2) { animation-delay: 150ms; }
+.msg-pending span:nth-child(3) { animation-delay: 300ms; }
+@keyframes dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-3px); }
+}
+
+/* Composer */
+.bot-composer {
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  padding: 14px 40px 20px;
+}
+.bot-composer .bot-inner { padding: 0; }
+.composer {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-16);
+  padding: 14px 16px 12px;
+  box-shadow: var(--shadow-2);
+  transition: border-color var(--dur), box-shadow var(--dur);
+}
+.composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-bg), var(--shadow-2);
+}
+.composer-input {
+  width: 100%; border: 0; outline: none; resize: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 15px; line-height: 1.5;
+  color: var(--text);
+  min-height: 44px;
+}
+.composer-input::placeholder { color: var(--muted); }
+.composer-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 8px;
+}
+.composer-tools {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  flex: 1; min-width: 0;
+}
+.composer-tools .chip {
+  background: var(--panel); border: 1px solid var(--border-soft);
+}
+.composer-tools .chip.is-active {
+  background: var(--text); color: var(--bg); border-color: var(--text);
+}
+
+/* Keyboard shortcuts hint */
+.bot-shortcuts {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0 0;
+  font-size: 11px; color: var(--dim);
+  flex-wrap: wrap;
+}
+.bot-shortcut-sep { color: var(--border-hi); }

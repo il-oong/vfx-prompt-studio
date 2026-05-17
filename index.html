@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VFX Prompt Studio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/bot.css">
+<link rel="stylesheet" href="css/prompts.css">
+<link rel="stylesheet" href="css/archive.css">
+<link rel="stylesheet" href="css/guide.css">
+<link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Left Rail (4 tabs + logo + settings) ───────────────────── -->
+  <nav class="rail" aria-label="primary">
+    <div class="rail-logo" title="VFX Prompt Studio">V</div>
+    <button class="rail-btn is-active" data-tab="studio" aria-label="Studio">
+      <span class="rail-ic">✦</span><span class="rail-lb">Studio</span>
+    </button>
+    <button class="rail-btn" data-tab="prompts" aria-label="Prompts">
+      <span class="rail-ic">◆</span><span class="rail-lb">Prompts</span>
+    </button>
+    <button class="rail-btn" data-tab="archive" aria-label="Archive">
+      <span class="rail-ic">▦</span><span class="rail-lb">Archive</span>
+    </button>
+    <button class="rail-btn" data-tab="guide" aria-label="Guide">
+      <span class="rail-ic">✸</span><span class="rail-lb">Guide</span>
+    </button>
+    <div class="rail-spacer"></div>
+    <button class="rail-iconbtn" id="theme-toggle" title="라이트/다크 전환">
+      <span id="theme-icon">◐</span>
+    </button>
+    <button class="rail-iconbtn" id="settings-open" title="설정">⚙</button>
+  </nav>
+
+  <!-- ── Main column ────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Context strip: project switcher + status -->
+    <header class="ctx" id="ctx">
+      <div class="ctx-project" id="ctx-project-trigger">
+        <span class="ctx-swatch" id="ctx-swatch"></span>
+        <span class="ctx-info">
+          <span class="ctx-name" id="ctx-name">프로젝트 없음</span>
+          <span class="ctx-sub" id="ctx-sub">+ 새 프로젝트로 시작하기</span>
+        </span>
+        <span class="ctx-caret">▾</span>
+      </div>
+      <div class="ctx-right">
+        <span class="ctx-status" id="ctx-status">offline · API 키 필요</span>
+      </div>
+      <!-- Dropdown -->
+      <div class="ctx-dropdown" id="ctx-dropdown" hidden>
+        <div class="ctx-dropdown-header">프로젝트</div>
+        <div class="ctx-dropdown-list" id="ctx-dropdown-list"></div>
+        <button class="ctx-dropdown-new" id="ctx-dropdown-new">+ 새 프로젝트</button>
+      </div>
+    </header>
+
+    <!-- Tab content host -->
+    <section class="content" id="content"><!-- filled by tab-*.js --></section>
+  </main>
+</div>
+
+<!-- ── Modals (project, prompt-edit, file-preview, settings) ─── -->
+<div class="modal-host" id="modal-host" hidden></div>
+
+<!-- ── Toast layer ─────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<!-- Scripts: load order matters under file:// (no modules) -->
+<script src="js/data/tool-presets.js"></script>
+<script src="js/data/guide-content.js"></script>
+<script src="js/db.js"></script>
+<script src="js/bot.js"></script>
+<script src="js/tab-prompts.js"></script>
+<script src="js/tab-archive.js"></script>
+<script src="js/tab-guide.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
