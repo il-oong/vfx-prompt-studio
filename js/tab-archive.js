@@ -24,6 +24,7 @@
     permission: 'unknown', // 'granted' | 'denied' | 'prompt' | 'unsupported'
     loading: false,
     error: null,
+    fileFilter: 'all', // 'all' | 'image' | 'video'
   };
   let host = null;
   let blobUrls = new Set();
@@ -322,6 +323,11 @@
               }).join('')}
             </div>
             <div class="ar-bar-right">
+              <div class="ar-filter-chips">
+                <button class="chip btn--sm ${state.fileFilter === 'all' ? 'is-active' : ''}" data-kind="all">전체</button>
+                <button class="chip btn--sm ${state.fileFilter === 'image' ? 'is-active' : ''}" data-kind="image">이미지</button>
+                <button class="chip btn--sm ${state.fileFilter === 'video' ? 'is-active' : ''}" data-kind="video">영상</button>
+              </div>
               <span class="ar-count">${state.files.length} files</span>
               <button class="btn btn--sm" id="ar-refresh">↻ refresh</button>
             </div>
@@ -329,25 +335,29 @@
 
           ${state.loading ? '<div class="ar-loading">불러오는 중…</div>' : ''}
 
-          ${!state.loading && state.files.length === 0 ? `
-            <div class="empty">
-              <div class="empty-icon">▦</div>
-              <h3>이 폴더에 미디어가 없어요</h3>
-              <p>이미지 ${IMG_EXT.join('/')}, 영상 ${VIDEO_EXT.join('/')} 만 표시됩니다.</p>
-            </div>
-          ` : `
-            <div class="ar-grid">
-              ${state.files.map((f) => `
-                <button class="ar-tile" data-file="${esc(f.path)}">
-                  <div class="ar-thumb" data-thumb="${esc(f.path)}"></div>
-                  <div class="ar-tile-meta">
-                    <span class="ar-tile-name">${esc(f.name)}</span>
-                    <span class="ar-tile-kind">${esc(f.ext.toUpperCase())}</span>
-                  </div>
-                </button>
-              `).join('')}
-            </div>
-          `}
+          ${(() => {
+            const visible = state.files.filter((f) => state.fileFilter === 'all' || f.kind === state.fileFilter);
+            if (!state.loading && visible.length === 0) return `
+              <div class="empty">
+                <div class="empty-icon">▦</div>
+                <h3>이 폴더에 미디어가 없어요</h3>
+                <p>이미지 ${IMG_EXT.join('/')}, 영상 ${VIDEO_EXT.join('/')} 만 표시됩니다.</p>
+              </div>`;
+            return `
+              <div class="ar-grid">
+                ${visible.map((f) => `
+                  <button class="ar-tile" data-file="${esc(f.path)}">
+                    <div class="ar-thumb" data-thumb="${esc(f.path)}">
+                      ${f.kind === 'video' ? '<span class="thumb-play">▶</span>' : ''}
+                    </div>
+                    <div class="ar-tile-meta">
+                      <span class="ar-tile-name">${esc(f.name)}</span>
+                      <span class="ar-tile-kind">${esc(f.ext.toUpperCase())}</span>
+                    </div>
+                  </button>
+                `).join('')}
+              </div>`;
+          })()}
         </main>
       </div>
     `;
@@ -358,6 +368,12 @@
         const p = el.getAttribute('data-tree');
         state.currentPath = p;
         await loadFiles(p);
+      });
+    });
+    host.querySelectorAll('[data-kind]').forEach((el) => {
+      el.addEventListener('click', () => {
+        state.fileFilter = el.getAttribute('data-kind');
+        render();
       });
     });
     host.querySelector('#ar-repick')?.addEventListener('click', pickFolder);
