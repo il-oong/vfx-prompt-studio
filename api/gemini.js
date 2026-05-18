@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   // Parse body (Vercel auto-parses JSON if Content-Type is set)
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
-  const { messages = [], systemPrompt = '', model = 'gemini-2.0-flash' } = body;
+  const { messages = [], systemPrompt = '', model = 'gemini-2.5-flash' } = body;
 
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'messages[] required' });
