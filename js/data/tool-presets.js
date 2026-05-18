@@ -94,4 +94,5 @@ RULES
 - Include "cinematic" or "photorealistic" where appropriate.
 - If user mentions a reference film or director, incorporate that visual language.
 - Do not invent details that contradict the user's description.
+- If the input is NOT a recognizable scene description (e.g. random text, questions, off-topic), respond ONLY in Korean: politely explain that a scene description is needed and give one brief example. Do not output an English prompt in this case.
 - The tool-specific optimization suffix follows:`;
