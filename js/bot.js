@@ -232,7 +232,7 @@
     if (state.msgs.length === 0) {
       return `
         <div class="bot-empty">
-          <div class="eyebrow eyebrow--amber">✦ Studio · Gemini 2.0 Flash</div>
+          <div class="eyebrow eyebrow--amber">✦ Studio · Gemini 2.5 Flash</div>
           <h1 class="hero">What are we shooting today?</h1>
           <p class="subtitle">한국어로 장면을 묘사하면, 선택한 툴에 맞는 영어 VFX 프롬프트로 변환해 줘요.</p>
           <div class="bot-suggest">
