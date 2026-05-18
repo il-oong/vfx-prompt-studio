@@ -9,7 +9,7 @@
   let host = null;
   let currentSection = 'workflow';
 
-  // Builder state
+  // Video Builder state
   let builder = {
     shot: '', subjectKo: '', subjectEn: '', action: '',
     env: '', camera: '', lighting: '', look: '',
@@ -17,8 +17,17 @@
   };
   let translateTimer = null;
 
+  // Image Builder state
+  let img = {
+    medium: '', subjectKo: '', subjectEn: '', pose: '',
+    bg: '', composition: '', lighting: '', color: '', look: '',
+    ratio: '--ar 1:1', translating: false,
+  };
+  let imgTranslateTimer = null;
+
   const SECTIONS = [
-    { id: 'builder',             label: '✦ Prompt Builder', group: 'GUIDE' },
+    { id: 'builder',             label: '✦ Video Builder',  group: 'GUIDE' },
+    { id: 'image-builder',       label: '✦ Image Builder',  group: 'GUIDE' },
     { id: 'workflow',            label: 'Workflow',         group: 'GUIDE' },
     { id: 'tools',               label: 'AI Tools',         group: 'GUIDE' },
     { id: 'glossary',            label: 'Glossary',         group: 'GUIDE' },
@@ -535,8 +544,298 @@
       </div>`;
   }
 
+  // ── Image Builder ─────────────────────────────────────────────
+  async function doImageTranslate(text) {
+    try {
+      const r = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', text }],
+          systemPrompt: 'Translate the Korean noun phrase to concise cinematic English. Output ONLY the English translation, 2-8 words, lowercase, no quotes, no explanation.',
+        }),
+      });
+      const data = await r.json().catch(() => ({}));
+      img.subjectEn = (data.text || text).trim().replace(/\.$/, '');
+    } catch {
+      img.subjectEn = text;
+    }
+    img.translating = false;
+    updateImagePromptResult();
+    const hint = host?.querySelector('#img-subject-hint');
+    if (hint) hint.textContent = img.subjectEn ? '→ ' + img.subjectEn : '';
+  }
+
+  function scheduleImageTranslate(text) {
+    clearTimeout(imgTranslateTimer);
+    if (!text.trim()) {
+      img.subjectEn = '';
+      img.translating = false;
+      updateImagePromptResult();
+      return;
+    }
+    if (!hasKorean(text)) {
+      img.subjectEn = text;
+      img.translating = false;
+      const hint = host?.querySelector('#img-subject-hint');
+      if (hint) hint.textContent = '';
+      updateImagePromptResult();
+      return;
+    }
+    img.translating = true;
+    updateImagePromptResult();
+    imgTranslateTimer = setTimeout(() => doImageTranslate(text), 700);
+  }
+
+  const IMAGE_OPTS = {
+    medium: [
+      ['cinematic photograph', '영화 스틸 사진'],
+      ['editorial photography', '에디토리얼 사진'],
+      ['digital concept art', '디지털 컨셉아트'],
+      ['oil painting', '유화'],
+      ['watercolor painting', '수채화'],
+      ['3D CGI render', '3D 렌더'],
+      ['ink illustration', '잉크 일러스트'],
+      ['pixel art', '픽셀 아트'],
+    ],
+    pose: [
+      ['standing, facing camera', '정면 서 있는'],
+      ['sitting', '앉아 있는'],
+      ['back to camera', '뒷모습'],
+      ['in motion, running', '달리는'],
+      ['close portrait, looking up', '클로즈 업샷'],
+      ['profile side view', '옆모습'],
+      ['crouching low', '웅크린'],
+      ['dramatic fallen pose', '극적인 쓰러진 자세'],
+    ],
+    bg: [
+      ['urban street at night', '도시 야경 거리'],
+      ['dense forest with mist', '짙은 안개 숲'],
+      ['minimalist studio white', '미니멀 흰 배경'],
+      ['dark void black background', '검은 허공'],
+      ['neon-lit alleyway', '네온 골목'],
+      ['vast desert dunes', '광활한 사막'],
+      ['abandoned industrial ruins', '폐공장'],
+      ['underwater ocean depths', '심해'],
+      ['outer space starfield', '우주 / 별'],
+      ['cozy warm interior', '아늑한 실내'],
+    ],
+    composition: [
+      ['rule of thirds', '삼분할 구도'],
+      ['centered symmetrical', '중심 대칭'],
+      ['extreme close-up face fill', '얼굴 클로즈업'],
+      ['wide full body shot', '전신 와이드'],
+      ['low angle heroic upshot', '영웅적 저각'],
+      ['bird\'s eye top down', '조감도'],
+      ['negative space minimal', '네거티브 스페이스'],
+      ['bokeh shallow depth of field', '아웃포커스 보케'],
+    ],
+    lighting: [
+      ['golden hour rim light', '황금시간대 윤곽광'],
+      ['blue hour backlight', '블루아워 역광'],
+      ['dramatic Rembrandt lighting', '렘브란트 조명'],
+      ['soft studio diffused light', '소프트박스 확산광'],
+      ['neon practical glow', '네온 실광원'],
+      ['harsh single spotlight', '단일 스포트라이트'],
+      ['overcast flat light', '흐린 날 평탄광'],
+      ['candlelight warm glow', '촛불 따뜻한 빛'],
+    ],
+    color: [
+      ['warm golden tones', '따뜻한 황금 톤'],
+      ['cool blue tones', '차가운 블루 톤'],
+      ['muted earth palette', '차분한 어스 톤'],
+      ['vibrant saturated colors', '선명한 고채도'],
+      ['desaturated monochrome', '탈채색 모노크롬'],
+      ['soft pastel palette', '파스텔 소프트'],
+      ['deep shadow noir palette', '딥 섀도우 누아르'],
+      ['electric neon palette', '네온 일렉트릭'],
+    ],
+    look: [
+      ['photorealistic ultra-detailed', '극사실 초디테일'],
+      ['35mm Kodak film grain', '35mm 코닥 필름'],
+      ['painterly brushstroke texture', '회화적 붓터치'],
+      ['hyper-sharp 8K rendered', '하이퍼 샤프 8K'],
+      ['vintage faded film', '빈티지 바랜 필름'],
+      ['anamorphic cinematic look', '아나모픽 시네마틱'],
+      ['anime cel-shaded style', '애니메이션 셀쉐이딩'],
+      ['award-winning concept art', '수상 컨셉아트'],
+    ],
+    ratio: [
+      ['--ar 1:1', '1:1 정방형'],
+      ['--ar 4:3', '4:3 표준'],
+      ['--ar 16:9', '16:9 와이드'],
+      ['--ar 3:4', '3:4 세로'],
+      ['--ar 9:16', '9:16 모바일'],
+      ['--ar 2:3', '2:3 포트레이트'],
+    ],
+  };
+
+  function assembleImagePrompt() {
+    const parts = [];
+    if (img.medium) parts.push(img.medium);
+    const subj = (img.subjectEn || img.subjectKo || '').trim();
+    if (subj) parts.push(subj + (img.pose ? ', ' + img.pose : ''));
+    else if (img.pose) parts.push(img.pose);
+    if (img.bg)          parts.push(img.bg);
+    if (img.composition) parts.push(img.composition);
+    if (img.lighting)    parts.push(img.lighting);
+    if (img.color)       parts.push(img.color);
+    if (img.look)        parts.push(img.look);
+    if (!parts.length && !img.ratio) return '';
+    const main = parts.join(', ');
+    return img.ratio ? (main ? main + ' ' + img.ratio : img.ratio) : main;
+  }
+
+  function updateImagePromptResult() {
+    if (!host) return;
+    const result = host.querySelector('.g-img-result');
+    if (!result) return;
+    if (img.translating) {
+      result.className = 'g-builder-result g-img-result';
+      result.innerHTML = '<div class="g-builder-placeholder">번역 중…</div>';
+      return;
+    }
+    const prompt = assembleImagePrompt();
+    result.className = 'g-builder-result g-img-result' + (prompt ? ' is-filled' : '');
+    result.innerHTML = prompt
+      ? `<div class="g-builder-prompt">${esc(prompt)}</div>
+         <button class="btn btn--sm g-builder-copy" data-copy="${esc(prompt)}">⎘ Copy</button>`
+      : `<div class="g-builder-placeholder">위에서 항목을 선택하면 여기에 프롬프트가 만들어져요</div>`;
+    const copyBtn = result.querySelector('.g-builder-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard?.writeText(copyBtn.getAttribute('data-copy'))
+          .then(() => window.App?.toast('복사됐어요'));
+      });
+    }
+  }
+
+  function imgChipRow(field, opts) {
+    return opts.map(([en, ko]) => `
+      <button class="g-builder-chip ${img[field] === en ? 'is-active' : ''}"
+              data-img-field="${esc(field)}" data-val="${esc(en)}" title="${esc(en)}">
+        ${esc(ko)}
+      </button>`).join('');
+  }
+
+  function renderImageBuilder() {
+    const prompt = assembleImagePrompt();
+    return `
+      <div class="eyebrow">Guide</div>
+      <h2 class="title">Image Prompt Builder</h2>
+      <p class="subtitle">정지 이미지 생성용 프롬프트 빌더입니다. Midjourney, Flux, Stable Diffusion에 최적화되어 있습니다.</p>
+
+      <div class="g-builder-rules">
+        <div class="g-builder-rules-title">Midjourney 주요 파라미터</div>
+        <div class="g-builder-rules-grid">
+          <div class="g-builder-rule-card">
+            <div class="g-builder-rule-tool">스타일 / 캐릭터 유지</div>
+            <div class="g-builder-rule-cmds">
+              <code>--sref URL</code> 스타일 레퍼런스<br>
+              <code>--cref URL</code> 캐릭터 레퍼런스<br>
+              <code>--iw 0.5–2</code> 이미지 반영 강도
+            </div>
+          </div>
+          <div class="g-builder-rule-card">
+            <div class="g-builder-rule-tool">품질 / 스타일 제어</div>
+            <div class="g-builder-rule-cmds">
+              <code>--q 2</code> 고품질 렌더링<br>
+              <code>--stylize 0–1000</code> 예술성<br>
+              <code>--v 7</code> 최신 모델 지정
+            </div>
+          </div>
+          <div class="g-builder-rule-card">
+            <div class="g-builder-rule-tool">구성 제어</div>
+            <div class="g-builder-rule-cmds">
+              <code>--no blurry, text</code> 제외어<br>
+              <code>--chaos 10–50</code> 변화량<br>
+              <code>--seed 12345</code> 고정 시드
+            </div>
+          </div>
+          <div class="g-builder-rule-card">
+            <div class="g-builder-rule-tool">Flux / SDXL</div>
+            <div class="g-builder-rule-cmds">
+              IP-Adapter로 스타일 이식<br>
+              ControlNet으로 포즈 고정<br>
+              cfg_scale 5–8 권장
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="g-builder">
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">미디엄 / 스타일</div>
+          <div class="g-builder-chips">${imgChipRow('medium', IMAGE_OPTS.medium)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">
+            피사체
+            <span class="g-builder-label-badge">한글 자동 번역</span>
+          </div>
+          <input class="input g-builder-input" id="img-subject"
+                 placeholder="예: 갑옷 입은 기사 / lone astronaut"
+                 value="${esc(img.subjectKo)}">
+          <div id="img-subject-hint" class="g-builder-hint">${img.subjectEn && hasKorean(img.subjectKo) ? '→ ' + esc(img.subjectEn) : ''}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">포즈 / 행동</div>
+          <div class="g-builder-chips">${imgChipRow('pose', IMAGE_OPTS.pose)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">배경 / 장소</div>
+          <div class="g-builder-chips">${imgChipRow('bg', IMAGE_OPTS.bg)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">구도</div>
+          <div class="g-builder-chips">${imgChipRow('composition', IMAGE_OPTS.composition)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">조명</div>
+          <div class="g-builder-chips">${imgChipRow('lighting', IMAGE_OPTS.lighting)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">색감 / 분위기</div>
+          <div class="g-builder-chips">${imgChipRow('color', IMAGE_OPTS.color)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">룩 / 마감</div>
+          <div class="g-builder-chips">${imgChipRow('look', IMAGE_OPTS.look)}</div>
+        </div>
+
+        <div class="g-builder-row">
+          <div class="g-builder-label">비율 (--ar)</div>
+          <div class="g-builder-chips">
+            ${IMAGE_OPTS.ratio.map(([val, ko]) => `
+              <button class="g-builder-chip ${img.ratio === val ? 'is-active' : ''}"
+                      data-img-field="ratio" data-val="${esc(val)}">${esc(ko)}</button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="g-builder-result g-img-result ${prompt ? 'is-filled' : ''}">
+          ${img.translating
+            ? `<div class="g-builder-placeholder">번역 중…</div>`
+            : prompt
+              ? `<div class="g-builder-prompt">${esc(prompt)}</div>
+                 <button class="btn btn--sm g-builder-copy" data-copy="${esc(prompt)}">⎘ Copy</button>`
+              : `<div class="g-builder-placeholder">위에서 항목을 선택하면 여기에 프롬프트가 만들어져요</div>`
+          }
+        </div>
+
+      </div>`;
+  }
+
   function renderContent() {
-    if (currentSection === 'builder')             return renderBuilder();
+    if (currentSection === 'image-builder')       return renderImageBuilder();
     if (currentSection === 'workflow')            return renderWorkflow();
     if (currentSection === 'tools')               return renderTools();
     if (currentSection === 'glossary')            return renderGlossary();
@@ -595,6 +894,23 @@
           .then(() => window.App?.toast('복사됐어요'));
       });
     });
+
+    // Image Builder chips
+    host.querySelectorAll('[data-img-field]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const field = btn.getAttribute('data-img-field');
+        const val = btn.getAttribute('data-val');
+        img[field] = (field === 'ratio') ? val : (img[field] === val ? '' : val);
+        render();
+      });
+    });
+    const imgSubjectInput = host.querySelector('#img-subject');
+    if (imgSubjectInput) {
+      imgSubjectInput.addEventListener('input', (e) => {
+        img.subjectKo = e.target.value;
+        scheduleImageTranslate(e.target.value);
+      });
+    }
 
     const q = host.querySelector('#g-search');
     if (q) {

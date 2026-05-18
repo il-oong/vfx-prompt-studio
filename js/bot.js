@@ -271,7 +271,6 @@
     if (!elContent) return;
     elContent.innerHTML = `
       <div class="bot-shell">
-        ${renderHistoryPanel()}
         <div class="bot-main">
           <div class="bot-scroll" id="bot-scroll">
             <div class="bot-inner">
