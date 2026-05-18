@@ -238,9 +238,7 @@
       if (r.ok) { state.apiStatus = 'ok'; renderApiStatus(); return; }
       state.apiStatus = 'offline';
     } catch {
-      // Likely running offline / file:// — fine, just mark accordingly
-      const overrideKey = await window.VFXDB.getSetting('personalGeminiKey');
-      state.apiStatus = overrideKey ? 'ok' : 'offline';
+      state.apiStatus = 'offline';
     }
     renderApiStatus();
   }
@@ -344,7 +342,6 @@
 
   /* ── Settings modal ─────────────────────────────────────────── */
   async function openSettingsModal() {
-    const personalKey = (await window.VFXDB.getSetting('personalGeminiKey')) || '';
     const apiStatusBadge = state.apiStatus === 'ok'
       ? '<span class="chip chip--emerald">● 연결됨</span>'
       : state.apiStatus === 'no-key'
@@ -365,17 +362,9 @@
               ${apiStatusBadge}
             </div>
             <p class="field-hint" style="margin:0 0 12px;">
-              기본은 Vercel 서버리스 함수(<code>/api/gemini</code>)로 호출합니다.
               Vercel 프로젝트 → Settings → Environment Variables 에
-              <code>GEMINI_API_KEY</code> 를 추가하세요.
+              <code>GEMINI_API_KEY</code> 를 추가하면 자동으로 연결됩니다.
             </p>
-            <div class="field">
-              <label class="field-label">개인 API 키 (선택 — 클라이언트에서 직접 호출)</label>
-              <input class="input" id="set-key" type="password"
-                     value="${escapeHtml(personalKey)}"
-                     placeholder="개인 키를 넣으면 서버 함수 대신 브라우저에서 직접 Gemini 를 부릅니다">
-              <span class="field-hint">로컬 개발용. <strong>배포본에는 넣지 마세요.</strong> localStorage 가 아니라 IndexedDB 에 저장됩니다.</span>
-            </div>
             <button class="btn btn--sm" id="set-recheck">연결 다시 확인</button>
           </div>
 
@@ -402,8 +391,7 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn" id="set-close">닫기</button>
-          <button class="btn btn--primary" id="set-save">저장</button>
+          <button class="btn btn--primary" id="set-close">닫기</button>
         </div>
       </div>
     `);
@@ -418,17 +406,8 @@
     $$('[data-theme]').forEach((b) => {
       b.addEventListener('click', async () => {
         if (state.theme !== b.getAttribute('data-theme')) await toggleTheme();
-        // refresh
         $$('[data-theme]').forEach((x) => x.classList.toggle('is-active', x === b));
       });
-    });
-    $('#set-save').addEventListener('click', async () => {
-      const key = $('#set-key').value.trim();
-      if (key) await window.VFXDB.setSetting('personalGeminiKey', key);
-      else await window.VFXDB.delete('settings', 'personalGeminiKey');
-      await checkApiStatus();
-      closeModal();
-      toast('저장됨');
     });
     $('#set-export').addEventListener('click', exportAll);
     $('#set-import').addEventListener('click', importAll);

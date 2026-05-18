@@ -35,29 +35,7 @@
       window.BASE_SYSTEM_PROMPT +
       '\n\n[TOOL: ' + tool.label + ']\n' + tool.suffix;
 
-    const overrideKey = await window.VFXDB.getSetting('personalGeminiKey');
-
-    // Direct browser → Gemini fallback (if user supplied a personal key)
-    if (overrideKey) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${overrideKey}`;
-      const r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: messages.map((m) => ({
-            role: m.role === 'bot' ? 'model' : 'user',
-            parts: [{ text: m.text }],
-          })),
-          systemInstruction: { parts: [{ text: sys }] },
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
-        }),
-      });
-      if (!r.ok) throw new Error('Gemini 직접 호출 실패: ' + r.status);
-      const data = await r.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    }
-
-    // Default: Vercel function
+    // Vercel function
     const r = await fetch('/api/gemini', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
