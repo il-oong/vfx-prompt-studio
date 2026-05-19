@@ -11,7 +11,7 @@ window.TOOL_PRESETS = {
     label: 'Runway Gen-4',
     desc: '연속 카메라 무브, 영상 10초',
     color: 'emerald',
-    suffix: 'TOOL: Runway Gen-4. Emphasize continuous smooth camera movements with strong motion intent. Use action verbs: "dolly in slowly", "gentle pan right", "camera orbits clockwise". Describe motion intensity (subtle/moderate/intense). Include subject motion, camera direction, atmospheric elements. Single paragraph, 10 seconds.',
+    suffix: 'TOOL: Runway Gen-4. Emphasize continuous smooth camera movements with strong motion intent. Use action verbs: "dolly in slowly", "gentle pan right", "camera orbits clockwise". Describe motion intensity (subtle/moderate/intense). Include subject motion, camera direction, atmospheric elements. Single paragraph, 10 seconds. For multi-phase one-take moves, use the VERB-CHAIN pattern ("starts low, rises into an orbit, settles in front, pushes forward, ends on close-up") — Runway responds best to chained action verbs in one flowing sentence. For multi-take requests with cuts/transitions, output the full script but add a Korean note suggesting per-shot generation + canvas editing, since Gen-4 prefers one continuous shot per generation.',
   },
   kling: {
     id: 'kling',
@@ -19,7 +19,7 @@ window.TOOL_PRESETS = {
     label: 'Kling AI',
     desc: '5–10초 영상, 피사체 일관성',
     color: 'amber',
-    suffix: 'TOOL: Kling AI. Start with a duration hint ("5-second clip:"). Emphasize subject identity and clothing consistency across frames. Describe textures and materials concretely. Include physical accuracy cues: gravity, fluid, fabric behavior, "naturally accurate", "physically consistent".',
+    suffix: 'TOOL: Kling AI. Start with a duration hint ("5-second clip:"). Emphasize subject identity and clothing consistency across frames. Describe textures and materials concretely. Include physical accuracy cues: gravity, fluid, fabric behavior, "naturally accurate", "physically consistent". Kling is weak at multi-phase camera moves and scene transitions — keep camera moves to a single primary motion. If the user requests multi-take with cuts, output a per-shot script and add a short Korean note recommending separate generations.',
   },
   hailuo: {
     id: 'hailuo',
@@ -51,7 +51,7 @@ window.TOOL_PRESETS = {
     label: 'Sora',
     desc: '물리 정확도 + 시간적 일관성',
     color: 'accent',
-    suffix: 'TOOL: Sora (OpenAI). Use cinematic storytelling language. Sora excels at scene transitions and temporal coherence — include "scene transitions smoothly into" if needed. Prioritize physical accuracy (gravity, fluid dynamics, contact, reflections). Can describe longer sequences with scene progression.',
+    suffix: 'TOOL: Sora (OpenAI). Use cinematic storytelling language. Sora excels at scene transitions and temporal coherence — favor the TIME-MARKER or BEAT-MARKER pattern for one-take multi-phase moves, and use explicit "Shot 1 / Cut to Shot 2 / Dissolves to Shot 3" structure for multi-take sequences. Prioritize physical accuracy (gravity, fluid dynamics, contact, reflections). Can describe longer sequences with scene progression and named transitions (match cut, smash cut, dissolve).',
   },
   veo: {
     id: 'veo',
@@ -59,7 +59,7 @@ window.TOOL_PRESETS = {
     label: 'Google Veo 3',
     desc: '네이티브 오디오, 물리 정확도',
     color: 'amber',
-    suffix: 'TOOL: Veo 3 (Google DeepMind). Veo 3 supports native audio generation — if relevant, append audio descriptors in brackets: [AUDIO: ambient sound, dialogue if any, sound effects]. Use: "photorealistic", "natural motion", "scene coherence". Can include character dialogue in quotes. Emphasize temporal consistency.',
+    suffix: 'TOOL: Veo 3 (Google DeepMind). Veo 3 supports native audio generation — if relevant, append audio descriptors in brackets: [AUDIO: ambient sound, dialogue if any, sound effects]. Use: "photorealistic", "natural motion", "scene coherence". Can include character dialogue in quotes. Emphasize temporal consistency. For multi-phase one-take moves, use the BEAT-MARKER pattern; for multi-take sequences, use explicit "Shot 1 / Cut to / Dissolves to" structure — Veo 3 handles both well within an 8-second budget.',
   },
   wan: {
     id: 'wan',
@@ -93,6 +93,32 @@ VOCABULARY (use liberally)
 - Atmosphere: volumetric fog, haze, mist, rain-slick reflections, dust motes, light leaks
 - Look: 35mm film grain, anamorphic flare, teal-orange grade, bleach bypass, halation, chromatic aberration, kodak portra
 - Camera: dolly, pan, tilt, orbit, slow push, slow pull, whip pan, rack focus, crash zoom, parallax
+
+MULTI-PHASE CAMERA CHOREOGRAPHY (one-take / 원테이크)
+- If the user describes a sequence of camera moves over time (e.g. "이렇게 시작 → 중간엔 인물 주위를 돌고 → 마지막엔 정면에서 돌진하며 끝"), express it as a CONTINUOUS one-take in a single paragraph.
+- Use one of these three patterns (pick whichever fits the input best):
+  1. TIME-MARKER pattern — split the clip into seconds. Example:
+     "10-second one-take. 0-3s: low-angle close-up of boots on wet asphalt. 3-7s: camera orbits clockwise around the figure at chest height. 7-10s: camera tilts up, centers on eye-line, and dollies in fast, ending on extreme close-up."
+  2. BEAT-MARKER pattern — use "opens with → then → finally" or "first beat / second beat / final beat". Example:
+     "Continuous one-take that opens with a wide low-angle, then arcs 180° clockwise around the subject at shoulder height, and finally locks onto a centered eye-line as it crash-zooms in, ending tight on the subject's face."
+  3. VERB-CHAIN pattern — chain camera verbs without breaking the sentence: "starts low → rises into an orbit → settles in front → pushes forward → ends on close-up".
+- Always include the phrase "one continuous take" or "single uninterrupted take" so the model does not insert cuts.
+- Name the START framing (shot type + angle), the MIDDLE motion (orbit / arc / push / tracking direction), and the END framing (final composition) explicitly.
+- Multi-phase transition verbs: opens with, rises into, arcs around, settles on, pushes through, pulls back to, tilts up to, whips around to, crash-zooms into, ends on.
+- For image prompts (Midjourney / Flux), ignore multi-phase camera moves entirely — describe only the single moment shown.
+
+MULTI-TAKE / SCENE TRANSITIONS (여러 컷, 장면 전환)
+- If the user describes MULTIPLE distinct shots stitched together (e.g. "와이드 → 컷 → 클로즈업 → 디졸브 → 다음 장소"), structure it as a sequenced multi-take and name each transition explicitly.
+- Use SHOT/CUT markers: "Shot 1: ... Cut to Shot 2: ... Dissolve to Shot 3: ..." within the single paragraph, comma-chained.
+- Or use cinematic transition phrases inline: "cuts to", "match-cuts to", "smash-cuts to", "dissolves into", "cross-fades to", "whip-pan transition to", "fade to black, then fade up on", "morphs into", "wipes to".
+- Match cuts: name the visual element that carries across (e.g. "match cut on the spinning coin to a spinning planet"). This makes the transition coherent.
+- Time budget: if user gives a total duration, distribute it across shots (e.g. "8-second sequence — Shot 1 (3s) wide establishing, hard cut to Shot 2 (3s) close-up, dissolves to Shot 3 (2s) macro detail").
+- Keep continuity cues across shots: same character wardrobe, same color grade, same lighting key — state these once at the end so all shots inherit them.
+- Tool reality check:
+  · Sora and Veo 3 handle multi-shot sequences well — use them confidently.
+  · Runway Gen-4 prefers one continuous shot per generation; if user wants multi-take, suggest in Korean that they generate each shot separately and edit them, but still output the full multi-shot prompt as a script.
+  · Kling / Hailuo / Wan are weak at scene transitions — output a multi-shot script but add a short Korean note suggesting per-shot generation.
+- For image tools (Midjourney / Flux), if the user describes multiple shots, pick the single most iconic frame and prompt only that — explain the choice in Korean.
 
 RULES
 - Convert all concepts to vivid cinematic English in the prompt.
