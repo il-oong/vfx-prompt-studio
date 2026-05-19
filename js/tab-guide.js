@@ -44,6 +44,12 @@
     { id: 'runway-asset',        label: '영상 에셋 제작',   group: 'RUNWAY SITUATIONS' },
     { id: 'runway-longform',     label: '긴 영상 제작',     group: 'RUNWAY SITUATIONS' },
     { id: 'runway-story',        label: '스토리 영상 제작', group: 'RUNWAY SITUATIONS' },
+    { id: 'mv-preproduction',    label: '01. Pre-Production', group: 'MV WORKFLOW' },
+    { id: 'mv-production',       label: '02. Production',     group: 'MV WORKFLOW' },
+    { id: 'mv-offline',          label: '03. Offline Edit',   group: 'MV WORKFLOW' },
+    { id: 'mv-vfx',              label: '04. VFX / Composite', group: 'MV WORKFLOW' },
+    { id: 'mv-grade',            label: '05. Color Grade',    group: 'MV WORKFLOW' },
+    { id: 'mv-delivery',         label: '06. Delivery',       group: 'MV WORKFLOW' },
   ];
 
   function esc(s) {
@@ -256,10 +262,10 @@
       </div>`;
   }
 
-  function renderRunwaySection(data) {
+  function renderRunwaySection(data, eyebrow) {
     if (!data) return '<p style="color:var(--muted)">데이터를 불러오지 못했습니다.</p>';
     return `
-      <div class="eyebrow">Runway Guide</div>
+      <div class="eyebrow">${esc(eyebrow || 'Runway Guide')}</div>
       <h2 class="title">${esc(data.title)}</h2>
       <p class="subtitle">${esc(data.subtitle)}</p>
       ${data.sections.map((s) => `
@@ -964,6 +970,12 @@
     if (currentSection === 'runway-asset')        return renderRunwaySection(window.GUIDE_RUNWAY_SITUATIONS?.asset);
     if (currentSection === 'runway-longform')     return renderRunwaySection(window.GUIDE_RUNWAY_SITUATIONS?.longform);
     if (currentSection === 'runway-story')        return renderRunwaySection(window.GUIDE_RUNWAY_SITUATIONS?.story);
+    if (currentSection === 'mv-preproduction')    return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.preproduction, 'MV Workflow');
+    if (currentSection === 'mv-production')       return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.production, 'MV Workflow');
+    if (currentSection === 'mv-offline')          return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.offline, 'MV Workflow');
+    if (currentSection === 'mv-vfx')              return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.vfx, 'MV Workflow');
+    if (currentSection === 'mv-grade')            return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.grade, 'MV Workflow');
+    if (currentSection === 'mv-delivery')         return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.delivery, 'MV Workflow');
     return '';
   }
 
