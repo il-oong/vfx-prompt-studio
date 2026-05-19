@@ -952,6 +952,7 @@
   }
 
   function renderContent() {
+    if (currentSection === 'builder')             return renderBuilder();
     if (currentSection === 'image-builder')       return renderImageBuilder();
     if (currentSection === 'workflow')            return renderWorkflow();
     if (currentSection === 'tools')               return renderTools();
