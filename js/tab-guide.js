@@ -13,7 +13,7 @@
   let builder = {
     shot: '', subjectKo: '', subjectEn: '', action: '',
     env: '', camera: '', lighting: '', look: '',
-    ratio: '', duration: '10 seconds', translating: false,
+    ratio: '', duration: '10 seconds', translating: false, imageAnalyzing: false,
   };
   let translateTimer = null;
 
@@ -21,7 +21,7 @@
   let img = {
     medium: '', subjectKo: '', subjectEn: '', pose: '',
     bg: '', composition: '', lighting: '', color: '', look: '',
-    ratio: '--ar 1:1', translating: false,
+    ratio: '--ar 1:1', translating: false, imageAnalyzing: false,
   };
   let imgTranslateTimer = null;
 
@@ -242,6 +242,47 @@
             </div>` : ''}
         </div>
       `).join('')}`;
+  }
+
+  // ── Image → subject analysis ──────────────────────────────────
+  function analyzeImageForSubject(target) {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    inp.addEventListener('change', async () => {
+      const file = inp.files?.[0];
+      if (!file) return;
+      const state = target === 'builder' ? builder : img;
+      state.imageAnalyzing = true;
+      render();
+      try {
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const r = await fetch('/api/vision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: base64, mimeType: file.type || 'image/jpeg' }),
+        });
+        const data = await r.json().catch(() => ({}));
+        const desc = (data.text || '').trim();
+        if (desc) {
+          state.subjectKo = desc;
+          state.subjectEn = desc;
+        } else {
+          window.App?.toast('피사체를 인식하지 못했어요');
+        }
+      } catch {
+        window.App?.toast('이미지 분석 실패');
+      } finally {
+        state.imageAnalyzing = false;
+        render();
+      }
+    });
+    inp.click();
   }
 
   // ── Prompt Builder ────────────────────────────────────────────
@@ -480,9 +521,16 @@
             피사체
             <span class="g-builder-label-badge">한글 자동 번역</span>
           </div>
-          <input class="input g-builder-input" id="builder-subject"
-                 placeholder="예: 혼자 서 있는 탐험가 / lone figure in ruins"
-                 value="${esc(builder.subjectKo)}">
+          <div class="g-builder-subject-wrap">
+            <input class="input g-builder-input" id="builder-subject"
+                   placeholder="예: 혼자 서 있는 탐험가 / lone figure in ruins"
+                   value="${esc(builder.subjectKo)}">
+            <button class="btn btn--sm g-builder-img-btn" id="builder-img-btn"
+                    title="이미지를 업로드하면 피사체를 자동 분석해요"
+                    ${builder.imageAnalyzing ? 'disabled' : ''}>
+              ${builder.imageAnalyzing ? '분석 중…' : '📷 이미지 분석'}
+            </button>
+          </div>
           <div id="builder-subject-hint" class="g-builder-hint">${builder.subjectEn && hasKorean(builder.subjectKo) ? '→ ' + esc(builder.subjectEn) : ''}</div>
         </div>
 
@@ -775,9 +823,16 @@
             피사체
             <span class="g-builder-label-badge">한글 자동 번역</span>
           </div>
-          <input class="input g-builder-input" id="img-subject"
-                 placeholder="예: 갑옷 입은 기사 / lone astronaut"
-                 value="${esc(img.subjectKo)}">
+          <div class="g-builder-subject-wrap">
+            <input class="input g-builder-input" id="img-subject"
+                   placeholder="예: 갑옷 입은 기사 / lone astronaut"
+                   value="${esc(img.subjectKo)}">
+            <button class="btn btn--sm g-builder-img-btn" id="img-img-btn"
+                    title="이미지를 업로드하면 피사체를 자동 분석해요"
+                    ${img.imageAnalyzing ? 'disabled' : ''}>
+              ${img.imageAnalyzing ? '분석 중…' : '📷 이미지 분석'}
+            </button>
+          </div>
           <div id="img-subject-hint" class="g-builder-hint">${img.subjectEn && hasKorean(img.subjectKo) ? '→ ' + esc(img.subjectEn) : ''}</div>
         </div>
 
@@ -835,6 +890,7 @@
   }
 
   function renderContent() {
+    if (currentSection === 'builder')             return renderBuilder();
     if (currentSection === 'image-builder')       return renderImageBuilder();
     if (currentSection === 'workflow')            return renderWorkflow();
     if (currentSection === 'tools')               return renderTools();
@@ -888,6 +944,10 @@
         scheduleTranslate(e.target.value);
       });
     }
+    const builderImgBtn = host.querySelector('#builder-img-btn');
+    if (builderImgBtn) {
+      builderImgBtn.addEventListener('click', () => analyzeImageForSubject('builder'));
+    }
     host.querySelectorAll('.g-builder-copy').forEach((btn) => {
       btn.addEventListener('click', () => {
         navigator.clipboard?.writeText(btn.getAttribute('data-copy'))
@@ -910,6 +970,10 @@
         img.subjectKo = e.target.value;
         scheduleImageTranslate(e.target.value);
       });
+    }
+    const imgImgBtn = host.querySelector('#img-img-btn');
+    if (imgImgBtn) {
+      imgImgBtn.addEventListener('click', () => analyzeImageForSubject('image'));
     }
 
     const q = host.querySelector('#g-search');
