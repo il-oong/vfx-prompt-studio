@@ -14,14 +14,39 @@ window.GUIDE_WORKFLOW = [
     body: '최종 톤매핑과 컬러그레이드. 35mm 필름 그레인, halation, teal-orange 같은 룩으로 시네마틱하게 마감.' },
 ];
 
+/*
+  efficiency: 상황별 효율 별점 (1~5). null = 해당 상황 비대상 (이미지 전용 등).
+    - asset    : 단위 VFX 에셋 (루프 텍스처, 폭발, 파티클, 배경 플레이트 등)
+    - story    : 내러티브·캐릭터가 있는 스토리 영상 (다중 씬, 인물 일관성)
+    - longform : 1분 이상 긴 영상 (세그먼트 이어붙이기, 드리프트 관리)
+    - still    : 정지 이미지 (키비주얼, 무드보드, 컨셉아트)
+  price: 월 구독 또는 크레딧 기반 참고가 (2026 기준, 약가표시).
+*/
 window.GUIDE_TOOLS = [
-  { id: 'runway',     best: '연속 카메라 무브 · 모션 컨트롤', dur: '10초',  realism: 4, control: 5 },
-  { id: 'kling',      best: '피사체 일관성 유지',           dur: '5–10초', realism: 4, control: 4 },
-  { id: 'hailuo',     best: '포토리얼 시네마틱',           dur: '6초',   realism: 5, control: 3 },
-  { id: 'midjourney', best: '정지 이미지 · 무드보드',        dur: '—',     realism: 5, control: 4 },
-  { id: 'flux',       best: '정지 이미지 · 사진 톤',         dur: '—',     realism: 5, control: 4 },
-  { id: 'sora',       best: '물리 정확도 + 긴 시간',        dur: '20초',   realism: 5, control: 5 },
-  { id: 'veo',        best: '오디오 포함 영상',             dur: '8초',   realism: 5, control: 4 },
+  { id: 'runway',     best: '연속 카메라 무브 · 모션 컨트롤', dur: '10초',  realism: 4, control: 5,
+    price: '$15–$95/mo', priceNote: 'Standard $15 · Pro $35 · Unlimited $95',
+    efficiency: { asset: 5, story: 5, longform: 4, still: 3 } },
+  { id: 'kling',      best: '피사체 일관성 유지',           dur: '5–10초', realism: 4, control: 4,
+    price: '무료 / $7–$30', priceNote: '무료 일일 크레딧 · Standard $7 · Pro $30',
+    efficiency: { asset: 4, story: 3, longform: 3, still: null } },
+  { id: 'hailuo',     best: '포토리얼 시네마틱',           dur: '6초',   realism: 5, control: 3,
+    price: '무료 / $10–$25', priceNote: '무료 일일 크레딧 · Standard $10 · Premium $25',
+    efficiency: { asset: 3, story: 3, longform: 2, still: null } },
+  { id: 'midjourney', best: '정지 이미지 · 무드보드',        dur: '—',     realism: 5, control: 4,
+    price: '$10–$120/mo', priceNote: 'Basic $10 · Standard $30 · Pro $60 · Mega $120',
+    efficiency: { asset: null, story: null, longform: null, still: 5 } },
+  { id: 'flux',       best: '정지 이미지 · 사진 톤',         dur: '—',     realism: 5, control: 4,
+    price: 'API ~$0.05/img', priceNote: 'Replicate API 약 $0.04–0.06/장 · BFL 자체 플랜 있음',
+    efficiency: { asset: null, story: null, longform: null, still: 5 } },
+  { id: 'sora',       best: '물리 정확도 + 긴 시간',        dur: '20초',   realism: 5, control: 5,
+    price: '$20 / $200/mo', priceNote: 'ChatGPT Plus $20 (제한적) · Pro $200 (Sora 풀억세스)',
+    efficiency: { asset: 4, story: 5, longform: 5, still: 3 } },
+  { id: 'veo',        best: '오디오 포함 영상',             dur: '8초',   realism: 5, control: 4,
+    price: '$20 / $250/mo', priceNote: 'Google AI Pro $20 · AI Ultra $250 (헤비 사용자용)',
+    efficiency: { asset: 4, story: 5, longform: 4, still: null } },
+  { id: 'wan',        best: '피사체-배경 분리, 단순 명확',   dur: '4–8초', realism: 4, control: 3,
+    price: '무료 (오픈웨이트)', priceNote: '오픈소스 또는 호스팅 플랫폼별 종량제',
+    efficiency: { asset: 3, story: 3, longform: 3, still: null } },
 ];
 
 window.GUIDE_GLOSSARY = [

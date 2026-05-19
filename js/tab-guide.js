@@ -10,12 +10,18 @@
   let currentSection = 'workflow';
 
   // Video Builder state
+  // actionSeq: 순서가 있는 행동 시퀀스. 각 항목 { en, ko }.
+  //   - 칩 클릭: { en: chipEn, ko: chipKo } 로 push
+  //   - 자유 입력: 한글 → 자동 번역 후 push, 영어면 그대로 push
   let builder = {
-    shot: '', subjectKo: '', subjectEn: '', action: '',
+    shot: '', subjectKo: '', subjectEn: '',
+    actionSeq: [], actionInput: '', actionInputTranslating: false,
     env: '', camera: '', lighting: '', look: '',
     ratio: '', duration: '10 seconds', translating: false,
   };
   let translateTimer = null;
+  let actionInputTimer = null;
+  let actionInputPending = '';
 
   // Image Builder state
   let img = {
@@ -139,15 +145,27 @@
       </div>`;
   }
 
+  function effCell(v) {
+    if (v == null) return '<span class="g-eff-na" title="해당 상황 비대상">—</span>';
+    return '<span class="g-stars">' + stars(v) + '</span>';
+  }
+
+  const SITUATION_COLS = [
+    { key: 'asset',    label: 'Asset',    desc: '단위 VFX 에셋 · 루프 텍스처 · 폭발 · 파티클' },
+    { key: 'story',    label: 'Story',    desc: '내러티브·캐릭터 · 다중 씬 · 인물 일관성' },
+    { key: 'longform', label: 'Longform', desc: '1분+ 긴 영상 · 세그먼트 이어붙이기' },
+    { key: 'still',    label: 'Still',    desc: '정지 이미지 · 키비주얼 · 무드보드' },
+  ];
+
   function renderTools() {
     return `
       <div class="eyebrow eyebrow--amber">Volume Two</div>
       <h2 class="title">AI Tools</h2>
       <p class="subtitle">각 도구의 강점과 특성을 비교합니다. 씬에 맞는 도구를 고르는 것만으로도 결과가 달라집니다.</p>
       <div class="g-section">
-        <div class="g-tools">
+        <div class="g-tools g-tools--main">
           <div class="g-tools-row g-tools-head">
-            <span>Tool</span><span>Best for</span><span>Length</span><span>Realism</span><span>Control</span>
+            <span>Tool</span><span>Best for</span><span>Length</span><span>Realism</span><span>Control</span><span>Price</span>
           </div>
           ${window.GUIDE_TOOLS.map((t) => {
             const tool = window.TOOL_PRESETS[t.id];
@@ -158,9 +176,35 @@
               <span class="g-tools-dur">${esc(t.dur)}</span>
               <span class="g-stars">${stars(t.realism)}</span>
               <span class="g-stars">${stars(t.control)}</span>
+              <span class="g-tools-price" title="${esc(t.priceNote || '')}">${esc(t.price || '—')}</span>
             </div>`;
           }).join('')}
         </div>
+      </div>
+
+      <div class="g-section">
+        <div class="g-section-head">
+          <h3 class="g-section-title">상황별 효율</h3>
+        </div>
+        <p class="g-rw-desc">같은 툴이라도 작업 유형에 따라 효율이 크게 달라집니다. 별점은 해당 상황에서의 결과 품질·생산성 종합 평가입니다. <span class="g-eff-na-inline">—</span> 는 해당 상황 비대상 (예: 이미지 전용 툴의 영상 작업).</p>
+        <div class="g-eff">
+          <div class="g-eff-row g-eff-head">
+            <span>Tool</span>
+            ${SITUATION_COLS.map((c) => `<span title="${esc(c.desc)}">${esc(c.label)}</span>`).join('')}
+            <span>Price</span>
+          </div>
+          ${window.GUIDE_TOOLS.map((t) => {
+            const tool = window.TOOL_PRESETS[t.id];
+            const eff = t.efficiency || {};
+            return `
+            <div class="g-eff-row">
+              <span class="g-tools-name">${esc(tool.name)}</span>
+              ${SITUATION_COLS.map((c) => effCell(eff[c.key])).join('')}
+              <span class="g-tools-price" title="${esc(t.priceNote || '')}">${esc(t.price || '—')}</span>
+            </div>`;
+          }).join('')}
+        </div>
+        <p class="g-eff-note">가격은 2026 기준 참고가 (월 구독 또는 크레딧 환산). 셀에 마우스를 올리면 세부 플랜이 보입니다.</p>
       </div>`;
   }
 
@@ -336,10 +380,11 @@
     if (builder.camera) parts.push(builder.camera);
     if (builder.shot) parts.push(builder.shot);
     const subj = (builder.subjectEn || builder.subjectKo || '').trim();
+    const actionStr = actionSeqString();
     if (subj) {
-      parts.push('of ' + subj + (builder.action ? ' ' + builder.action : ''));
-    } else if (builder.action) {
-      parts.push(builder.action);
+      parts.push('of ' + subj + (actionStr ? ' ' + actionStr : ''));
+    } else if (actionStr) {
+      parts.push(actionStr);
     }
     if (builder.env)      parts.push(builder.env);
     if (builder.lighting) parts.push(builder.lighting);
@@ -377,9 +422,84 @@
   function chipRow(field, opts) {
     return opts.map(([en, ko]) => `
       <button class="g-builder-chip ${builder[field] === en ? 'is-active' : ''}"
-              data-field="${esc(field)}" data-val="${esc(en)}" title="${esc(en)}">
+              data-field="${esc(field)}" data-val="${esc(en)}" data-ko="${esc(ko)}" title="${esc(en)}">
         ${esc(ko)}
       </button>`).join('');
+  }
+
+  async function translateAction(text) {
+    try {
+      const r = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', text }],
+          systemPrompt: 'Translate this Korean action/motion description to a concise present-participle English phrase suitable for VFX video prompts (e.g. "walking slowly", "reaching out", "punching the wall"). Output ONLY the English phrase, 2-8 words, lowercase, no quotes, no period.',
+        }),
+      });
+      const data = await r.json().catch(() => ({}));
+      return (data.text || text).trim().replace(/\.$/, '');
+    } catch {
+      return text;
+    }
+  }
+
+  async function addActionFromInput() {
+    const text = (builder.actionInput || '').trim();
+    if (!text || builder.actionInputTranslating) return;
+    if (!hasKorean(text)) {
+      builder.actionSeq.push({ en: text, ko: text });
+      builder.actionInput = '';
+      render();
+      return;
+    }
+    builder.actionInputTranslating = true;
+    render();
+    const en = await translateAction(text);
+    builder.actionSeq.push({ en, ko: text });
+    builder.actionInput = '';
+    builder.actionInputTranslating = false;
+    render();
+  }
+
+  function actionSeqString() {
+    const items = builder.actionSeq.map((a) => a.en).filter(Boolean);
+    if (items.length === 0) return '';
+    return items.join(', then ');
+  }
+
+  function renderActionRow() {
+    const seq = builder.actionSeq;
+    return `
+      <div class="g-builder-row">
+        <div class="g-builder-label">
+          행동 / 모션
+          <span class="g-builder-label-badge">순서대로 누적</span>
+        </div>
+        <div class="g-builder-chips">${chipRow('action', BUILDER_OPTS.action)}</div>
+        <div class="g-builder-action-input-row">
+          <input class="input g-builder-input g-builder-action-input" id="builder-action-input"
+                 placeholder="예: 벽을 친다 / 갑자기 멈춰선다 (한글 자동 번역, Enter 로 추가)"
+                 value="${esc(builder.actionInput || '')}"
+                 ${builder.actionInputTranslating ? 'disabled' : ''}>
+          <button class="btn btn--sm" id="builder-action-add" ${builder.actionInputTranslating ? 'disabled' : ''}>
+            ${builder.actionInputTranslating ? '번역 중…' : '+ 추가'}
+          </button>
+        </div>
+        ${seq.length > 0 ? `
+          <div class="g-builder-seq">
+            ${seq.map((a, i) => `
+              <span class="g-builder-seq-item">
+                <span class="g-builder-seq-idx">${i + 1}</span>
+                <span class="g-builder-seq-text" title="${esc(a.en)}">${esc(a.ko || a.en)}</span>
+                ${i > 0 ? `<button class="g-builder-seq-move" data-action-up="${i}" title="앞으로">↑</button>` : ''}
+                ${i < seq.length - 1 ? `<button class="g-builder-seq-move" data-action-down="${i}" title="뒤로">↓</button>` : ''}
+                <button class="g-builder-seq-remove" data-action-remove="${i}" title="삭제">×</button>
+              </span>
+              ${i < seq.length - 1 ? '<span class="g-builder-seq-arrow">→</span>' : ''}
+            `).join('')}
+          </div>` : ''}
+      </div>`;
   }
 
   function renderBuilderRules() {
@@ -486,10 +606,7 @@
           <div id="builder-subject-hint" class="g-builder-hint">${builder.subjectEn && hasKorean(builder.subjectKo) ? '→ ' + esc(builder.subjectEn) : ''}</div>
         </div>
 
-        <div class="g-builder-row">
-          <div class="g-builder-label">행동 / 모션</div>
-          <div class="g-builder-chips">${chipRow('action', BUILDER_OPTS.action)}</div>
-        </div>
+        ${renderActionRow()}
 
         <div class="g-builder-row">
           <div class="g-builder-label">환경 / 분위기</div>
@@ -873,6 +990,13 @@
       btn.addEventListener('click', () => {
         const field = btn.getAttribute('data-field');
         const val = btn.getAttribute('data-val');
+        // Action chips append to sequence rather than toggling
+        if (field === 'action') {
+          const ko = btn.getAttribute('data-ko') || val;
+          builder.actionSeq.push({ en: val, ko });
+          render();
+          return;
+        }
         builder[field] = builder[field] === val ? '' : val;
         if (field === 'duration' || field === 'ratio') {
           // duration/ratio are not togglable to empty
@@ -888,6 +1012,50 @@
         scheduleTranslate(e.target.value);
       });
     }
+
+    // Action sequence: free-text input, add, remove, reorder
+    const actionInput = host.querySelector('#builder-action-input');
+    if (actionInput) {
+      actionInput.addEventListener('input', (e) => {
+        builder.actionInput = e.target.value;
+      });
+      actionInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addActionFromInput();
+        }
+      });
+    }
+    const actionAddBtn = host.querySelector('#builder-action-add');
+    if (actionAddBtn) {
+      actionAddBtn.addEventListener('click', () => addActionFromInput());
+    }
+    host.querySelectorAll('[data-action-remove]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = +btn.getAttribute('data-action-remove');
+        builder.actionSeq.splice(i, 1);
+        render();
+      });
+    });
+    host.querySelectorAll('[data-action-up]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = +btn.getAttribute('data-action-up');
+        if (i <= 0) return;
+        const seq = builder.actionSeq;
+        [seq[i - 1], seq[i]] = [seq[i], seq[i - 1]];
+        render();
+      });
+    });
+    host.querySelectorAll('[data-action-down]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = +btn.getAttribute('data-action-down');
+        const seq = builder.actionSeq;
+        if (i >= seq.length - 1) return;
+        [seq[i + 1], seq[i]] = [seq[i], seq[i + 1]];
+        render();
+      });
+    });
+
     host.querySelectorAll('.g-builder-copy').forEach((btn) => {
       btn.addEventListener('click', () => {
         navigator.clipboard?.writeText(btn.getAttribute('data-copy'))

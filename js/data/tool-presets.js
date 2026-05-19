@@ -55,11 +55,11 @@ window.TOOL_PRESETS = {
   },
   veo: {
     id: 'veo',
-    name: 'Veo 3',
-    label: 'Google Veo 3',
-    desc: '네이티브 오디오, 물리 정확도',
+    name: 'Veo 3.1',
+    label: 'Google Veo 3.1 (Flow)',
+    desc: '네이티브 오디오, 캐릭터 일관성, 8초',
     color: 'amber',
-    suffix: 'TOOL: Veo 3 (Google DeepMind). Veo 3 supports native audio generation — if relevant, append audio descriptors in brackets: [AUDIO: ambient sound, dialogue if any, sound effects]. Use: "photorealistic", "natural motion", "scene coherence". Can include character dialogue in quotes. Emphasize temporal consistency. For multi-phase one-take moves, use the BEAT-MARKER pattern; for multi-take sequences, use explicit "Shot 1 / Cut to / Dissolves to" structure — Veo 3 handles both well within an 8-second budget.',
+    suffix: 'TOOL: Veo 3.1 (Google DeepMind, accessible via Google Labs Flow and Vertex AI). Veo 3.1 improves character consistency, prompt adherence, and audio sync over Veo 3. Supports native audio generation — append audio descriptors in brackets when relevant: [AUDIO: ambient sound, dialogue, sound effects]. Use: "photorealistic", "natural motion", "scene coherence", "consistent character". Can include character dialogue in quotes. Emphasize temporal consistency. For multi-phase one-take moves, use the BEAT-MARKER pattern; for multi-take sequences, use explicit "Shot 1 / Cut to / Dissolves to" structure — Veo 3.1 handles both well within an 8-second budget.',
   },
   wan: {
     id: 'wan',
