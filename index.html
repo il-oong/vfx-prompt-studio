@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="css/prompts.css">
 <link rel="stylesheet" href="css/archive.css">
 <link rel="stylesheet" href="css/guide.css">
+<link rel="stylesheet" href="css/storyboard.css">
 <link rel="stylesheet" href="css/settings.css">
 </head>
 <body>
@@ -27,8 +28,11 @@
     <button class="rail-btn is-active" data-tab="studio" aria-label="Studio">
       <span class="rail-ic">✦</span><span class="rail-lb">Studio</span>
     </button>
+    <button class="rail-btn" data-tab="storyboard" aria-label="Storyboard">
+      <span class="rail-ic">◆</span><span class="rail-lb">Story</span>
+    </button>
     <button class="rail-btn" data-tab="prompts" aria-label="Prompts">
-      <span class="rail-ic">◆</span><span class="rail-lb">Prompts</span>
+      <span class="rail-ic">◇</span><span class="rail-lb">Prompts</span>
     </button>
     <button class="rail-btn" data-tab="archive" aria-label="Archive">
       <span class="rail-ic">▦</span><span class="rail-lb">Archive</span>
@@ -67,6 +71,11 @@
       </div>
     </header>
 
+    <!-- Stage chips strip (project workflow pipeline) -->
+    <div class="stages" id="stages" hidden>
+      <!-- filled by app.js renderStages() -->
+    </div>
+
     <!-- Tab content host -->
     <section class="content" id="content"><!-- filled by tab-*.js --></section>
   </main>
@@ -86,6 +95,7 @@
 <script src="js/tab-prompts.js"></script>
 <script src="js/tab-archive.js"></script>
 <script src="js/tab-guide.js"></script>
+<script src="js/tab-storyboard.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

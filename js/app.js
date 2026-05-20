@@ -7,7 +7,16 @@
    ─────────────────────────────────────────────────────────────── */
 
 (function () {
-  const TABS = ['studio', 'prompts', 'archive', 'guide'];
+  const TABS = ['studio', 'storyboard', 'prompts', 'archive', 'guide'];
+
+  // Production pipeline stages — each can be active/skip per project.
+  const STAGES = [
+    { id: 'concept',   label: '① Concept',   tab: 'studio',     desc: '시나리오 · 무드보드' },
+    { id: 'shotlist',  label: '② Shotlist',  tab: 'storyboard', desc: '컷 분할 · 콘티 이미지' },
+    { id: 'generate',  label: '③ Generate',  tab: 'studio',     desc: 'AI 영상 생성' },
+    { id: 'composite', label: '④ Composite', tab: 'archive',    desc: '합성 · VFX 작업' },
+    { id: 'deliver',   label: '⑤ Deliver',   tab: 'archive',    desc: '마스터 · 배포' },
+  ];
 
   const PROJECT_COLORS = [
     'linear-gradient(135deg,#5b5bd6,#c47b2c)',
@@ -206,6 +215,7 @@
       $('#ctx-sub').textContent = '+ 새 프로젝트로 시작하기';
     }
     renderApiStatus();
+    renderStages();
   }
 
   function renderApiStatus() {
@@ -467,6 +477,7 @@
     state.tab = id;
     $$('.rail-btn').forEach((b) => b.classList.toggle('is-active', b.getAttribute('data-tab') === id));
     await renderCurrentTab();
+    renderStages();
   }
 
   async function renderCurrentTab() {
@@ -475,6 +486,9 @@
     if (state.tab === 'studio') {
       await window.Bot.open(p?.id);
       window.Bot.render(host);
+    } else if (state.tab === 'storyboard') {
+      await window.Storyboard.open(p?.id);
+      window.Storyboard.render(host);
     } else if (state.tab === 'prompts') {
       await window.Prompts.open(p?.id);
       window.Prompts.render(host);
@@ -484,6 +498,71 @@
     } else if (state.tab === 'guide') {
       window.Guide.render(host);
     }
+  }
+
+  /* ── Stage chips (project workflow pipeline) ────────────────── */
+  function getProjectStages(p) {
+    // Returns merged stage state — defaults to all active
+    const stored = p?.stages || {};
+    const merged = {};
+    for (const stg of STAGES) {
+      merged[stg.id] = stored[stg.id] || { status: 'active' };
+    }
+    return merged;
+  }
+
+  async function toggleStageSkip(stageId) {
+    const p = getActiveProject();
+    if (!p) return;
+    if (!p.stages) p.stages = {};
+    if (!p.stages[stageId]) p.stages[stageId] = { status: 'active' };
+    p.stages[stageId].status = p.stages[stageId].status === 'skip' ? 'active' : 'skip';
+    await window.VFXDB.put('projects', p);
+    renderStages();
+  }
+
+  function renderStages() {
+    const stripEl = $('#stages');
+    if (!stripEl) return;
+    const p = getActiveProject();
+    if (!p) { stripEl.hidden = true; return; }
+    stripEl.hidden = false;
+
+    const stages = getProjectStages(p);
+    const activeStages = STAGES.filter((s) => stages[s.id].status !== 'skip');
+    const activeCount = activeStages.length;
+
+    stripEl.innerHTML = `
+      <div class="stages-inner">
+        ${STAGES.map((stg) => {
+          const st = stages[stg.id];
+          const isSkip = st.status === 'skip';
+          const isActiveTab = state.tab === stg.tab;
+          return `
+            <button class="stage-chip ${isSkip ? 'is-skip' : ''} ${isActiveTab ? 'is-current' : ''}"
+                    data-stage="${stg.id}" data-tab="${stg.tab}" title="${escapeHtml(stg.desc)}">
+              <span class="stage-chip-label">${escapeHtml(stg.label)}</span>
+              <span class="stage-chip-desc">${escapeHtml(stg.desc)}</span>
+              <button class="stage-skip-btn" data-skip="${stg.id}" title="${isSkip ? '활성화' : '건너뛰기'}">${isSkip ? '+' : '⊘'}</button>
+            </button>`;
+        }).join('')}
+        <div class="stages-meta">활성 ${activeCount} / ${STAGES.length} 단계</div>
+      </div>
+    `;
+
+    stripEl.querySelectorAll('[data-stage]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (e.target.closest('[data-skip]')) return;
+        const tab = btn.getAttribute('data-tab');
+        if (tab && tab !== state.tab) switchTab(tab);
+      });
+    });
+    stripEl.querySelectorAll('[data-skip]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleStageSkip(btn.getAttribute('data-skip'));
+      });
+    });
   }
 
   /* ── First-run demo seed ─────────────────────────────────────── */
@@ -568,9 +647,10 @@
         setTimeout(() => $('#composer-input')?.focus(), 60);
       }
       if (e.key === '1') switchTab('studio');
-      if (e.key === '2') switchTab('prompts');
-      if (e.key === '3') switchTab('archive');
-      if (e.key === '4') switchTab('guide');
+      if (e.key === '2') switchTab('storyboard');
+      if (e.key === '3') switchTab('prompts');
+      if (e.key === '4') switchTab('archive');
+      if (e.key === '5') switchTab('guide');
     });
   }
 
