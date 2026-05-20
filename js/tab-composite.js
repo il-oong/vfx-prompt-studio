@@ -119,21 +119,32 @@
   }
 
   /* ── FFmpeg.wasm lazy loader ─────────────────────────────────── */
+  function loadExternalScript(src) {
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = res;
+      s.onerror = () => rej(new Error('스크립트 로드 실패: ' + src));
+      document.head.appendChild(s);
+    });
+  }
+
   async function loadFFmpeg() {
     if (state.color.ffmpegReady || state.color.ffmpegLoading) return;
     state.color.ffmpegLoading = true;
     render();
     try {
+      const FFMPEG_VER = '0.12.10';
+      const CORE_VER = '0.12.6';
+      const UTIL_VER = '0.12.1';
       if (!window.FFmpegWASM) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script');
-          s.src = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js';
-          s.onload = res;
-          s.onerror = () => rej(new Error('FFmpeg 스크립트 로드 실패 (네트워크 확인)'));
-          document.head.appendChild(s);
-        });
+        await loadExternalScript(`https://unpkg.com/@ffmpeg/ffmpeg@${FFMPEG_VER}/dist/umd/ffmpeg.js`);
+      }
+      if (!window.FFmpegUtil) {
+        await loadExternalScript(`https://unpkg.com/@ffmpeg/util@${UTIL_VER}/dist/umd/index.js`);
       }
       const { FFmpeg } = window.FFmpegWASM;
+      const { toBlobURL } = window.FFmpegUtil;
       window._ffmpeg = new FFmpeg();
       window._ffmpeg.on('progress', ({ progress }) => {
         if (state.color.extracting) {
@@ -144,9 +155,12 @@
           updateProgressUI();
         }
       });
+      // Use blob URLs (per official FFmpeg.wasm docs) so the core script
+      // and wasm load as same-origin even under strict COEP environments.
+      const baseURL = `https://unpkg.com/@ffmpeg/core@${CORE_VER}/dist/umd`;
       await window._ffmpeg.load({
-        coreURL: 'https://unpkg.com/@ffmpeg/[email protected]/dist/umd/ffmpeg-core.js',
-        wasmURL: 'https://unpkg.com/@ffmpeg/[email protected]/dist/umd/ffmpeg-core.wasm',
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
       });
       state.color.ffmpegReady = true;
     } catch (err) {
@@ -539,6 +553,8 @@
   }
 
   async function open(projectId) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
     state.projectId = projectId || null;
     state.project = projectId ? await window.VFXDB.get('projects', projectId) : null;
     state.activeView = 'checklist';

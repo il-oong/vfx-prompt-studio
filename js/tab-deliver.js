@@ -351,6 +351,8 @@
   }
 
   async function open(projectId) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
     state.projectId = projectId || null;
     state.project = projectId ? await window.VFXDB.get('projects', projectId) : null;
   }

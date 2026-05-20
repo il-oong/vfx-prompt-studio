@@ -32,10 +32,10 @@
   }
 
   function getConcept() {
-    if (!state.project) return { ...DEFAULT_CONCEPT };
-    if (!state.project.concept) state.project.concept = { ...DEFAULT_CONCEPT };
+    if (!state.project) return structuredClone(DEFAULT_CONCEPT);
+    if (!state.project.concept) state.project.concept = structuredClone(DEFAULT_CONCEPT);
     const c = state.project.concept;
-    if (!c.song) c.song = { ...DEFAULT_CONCEPT.song };
+    if (!c.song) c.song = structuredClone(DEFAULT_CONCEPT.song);
     if (!c.moodImages) c.moodImages = [];
     if (!c.referenceLinks) c.referenceLinks = [];
     return c;
@@ -368,6 +368,8 @@ RULES
   }
 
   async function open(projectId) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
     state.projectId = projectId || null;
     state.project = projectId ? await window.VFXDB.get('projects', projectId) : null;
     state.shotListResult = '';
