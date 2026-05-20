@@ -310,6 +310,9 @@
   border-color: var(--accent); font-weight: 600;
 }
 .g-builder-input { margin-top: 4px; }
+.g-builder-subject-wrap { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.g-builder-subject-wrap .g-builder-input { flex: 1; margin-top: 0; }
+.g-builder-img-btn { white-space: nowrap; flex-shrink: 0; }
 .g-builder-hint {
   font-family: var(--font-mono); font-size: 11px;
   color: var(--accent); min-height: 16px;
