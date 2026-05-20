@@ -1,12 +1,17 @@
 /* ───────────────────────────────────────────────────────────────
    js/db.js
    IndexedDB wrapper. Single database `VFXAppDB` with stores:
-   - projects   { id, name, description, color, dirHandle, createdAt }
+   - projects   { id, name, description, color, dirHandle, createdAt,
+                  stages: { concept, shotlist, generate, composite, deliver },
+                  concept: { scenario, songInfo, moodNotes } }
    - prompts    { id, projectId, title, content, originalKorean, tool,
                   category, tags[], isFavorite, createdAt }
    - file_memos { id, projectId, filePath, memo, tool, tags[], createdAt }
    - settings   { key, value }
    - chat       { id, projectId, role, text, tool, ts }   (bot history)
+   - scenes     { id, projectId, order, titleKo, descKo, descEn,
+                  durationSec, type, status, imageData, imageMime,
+                  videoPath, notes, createdAt, updatedAt }
 
    API (all async, return promises):
      VFXDB.ready()                        → opens / migrates DB
@@ -20,7 +25,7 @@
 
 (function () {
   const DB_NAME = 'VFXAppDB';
-  const DB_VERSION = 2;
+  const DB_VERSION = 3;
 
   let _db = null;
 
@@ -52,6 +57,11 @@
           const s = db.createObjectStore('chat', { keyPath: 'id' });
           s.createIndex('projectId', 'projectId', { unique: false });
           s.createIndex('ts', 'ts', { unique: false });
+        }
+        if (!db.objectStoreNames.contains('scenes')) {
+          const s = db.createObjectStore('scenes', { keyPath: 'id' });
+          s.createIndex('projectId', 'projectId', { unique: false });
+          s.createIndex('order', 'order', { unique: false });
         }
       };
       req.onsuccess = () => {
