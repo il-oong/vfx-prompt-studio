@@ -14,14 +14,39 @@ window.GUIDE_WORKFLOW = [
     body: '최종 톤매핑과 컬러그레이드. 35mm 필름 그레인, halation, teal-orange 같은 룩으로 시네마틱하게 마감.' },
 ];
 
+/*
+  efficiency: 상황별 효율 별점 (1~5). null = 해당 상황 비대상 (이미지 전용 등).
+    - asset    : 단위 VFX 에셋 (루프 텍스처, 폭발, 파티클, 배경 플레이트 등)
+    - story    : 내러티브·캐릭터가 있는 스토리 영상 (다중 씬, 인물 일관성)
+    - longform : 1분 이상 긴 영상 (세그먼트 이어붙이기, 드리프트 관리)
+    - still    : 정지 이미지 (키비주얼, 무드보드, 컨셉아트)
+  price: 월 구독 또는 크레딧 기반 참고가 (2026 기준, 약가표시).
+*/
 window.GUIDE_TOOLS = [
-  { id: 'runway',     best: '연속 카메라 무브 · 모션 컨트롤', dur: '10초',  realism: 4, control: 5 },
-  { id: 'kling',      best: '피사체 일관성 유지',           dur: '5–10초', realism: 4, control: 4 },
-  { id: 'hailuo',     best: '포토리얼 시네마틱',           dur: '6초',   realism: 5, control: 3 },
-  { id: 'midjourney', best: '정지 이미지 · 무드보드',        dur: '—',     realism: 5, control: 4 },
-  { id: 'flux',       best: '정지 이미지 · 사진 톤',         dur: '—',     realism: 5, control: 4 },
-  { id: 'sora',       best: '물리 정확도 + 긴 시간',        dur: '20초',   realism: 5, control: 5 },
-  { id: 'veo',        best: '오디오 포함 영상',             dur: '8초',   realism: 5, control: 4 },
+  { id: 'runway',     best: '연속 카메라 무브 · 모션 컨트롤', dur: '10초',  realism: 4, control: 5,
+    price: '$15–$95/mo', priceNote: 'Standard $15 · Pro $35 · Unlimited $95',
+    efficiency: { asset: 5, story: 5, longform: 4, still: 3 } },
+  { id: 'kling',      best: '피사체 일관성 유지',           dur: '5–10초', realism: 4, control: 4,
+    price: '무료 / $7–$30', priceNote: '무료 일일 크레딧 · Standard $7 · Pro $30',
+    efficiency: { asset: 4, story: 3, longform: 3, still: null } },
+  { id: 'hailuo',     best: '포토리얼 시네마틱',           dur: '6초',   realism: 5, control: 3,
+    price: '무료 / $10–$25', priceNote: '무료 일일 크레딧 · Standard $10 · Premium $25',
+    efficiency: { asset: 3, story: 3, longform: 2, still: null } },
+  { id: 'midjourney', best: '정지 이미지 · 무드보드',        dur: '—',     realism: 5, control: 4,
+    price: '$10–$120/mo', priceNote: 'Basic $10 · Standard $30 · Pro $60 · Mega $120',
+    efficiency: { asset: null, story: null, longform: null, still: 5 } },
+  { id: 'flux',       best: '정지 이미지 · 사진 톤',         dur: '—',     realism: 5, control: 4,
+    price: 'API ~$0.05/img', priceNote: 'Replicate API 약 $0.04–0.06/장 · BFL 자체 플랜 있음',
+    efficiency: { asset: null, story: null, longform: null, still: 5 } },
+  { id: 'sora',       best: '물리 정확도 + 긴 시간',        dur: '20초',   realism: 5, control: 5,
+    price: '$20 / $200/mo', priceNote: 'ChatGPT Plus $20 (제한적) · Pro $200 (Sora 풀억세스)',
+    efficiency: { asset: 4, story: 5, longform: 5, still: 3 } },
+  { id: 'veo',        best: '오디오 포함 영상',             dur: '8초',   realism: 5, control: 4,
+    price: '$20 / $250/mo', priceNote: 'Google AI Pro $20 · AI Ultra $250 (헤비 사용자용)',
+    efficiency: { asset: 4, story: 5, longform: 4, still: null } },
+  { id: 'wan',        best: '피사체-배경 분리, 단순 명확',   dur: '4–8초', realism: 4, control: 3,
+    price: '무료 (오픈웨이트)', priceNote: '오픈소스 또는 호스팅 플랫폼별 종량제',
+    efficiency: { asset: 3, story: 3, longform: 3, still: null } },
 ];
 
 window.GUIDE_GLOSSARY = [
@@ -365,6 +390,265 @@ window.GUIDE_RUNWAY_SITUATIONS = {
           ['클라이맥스', '"high contrast, dramatic lighting, close-up, underexposed shadows" — 감정의 정점.'],
           ['해소', '"warm golden light, slow motion, wide shot" — 긴장이 풀리고 결말로 향합니다.'],
         ],
+      },
+    ],
+  },
+};
+
+window.GUIDE_MV_WORKFLOW = {
+  preproduction: {
+    title: '01. Pre-Production',
+    subtitle: '기획·준비 단계 (1~4주). AI는 컨셉아트·스토리보드·Pre-viz에 투입.',
+    sections: [
+      {
+        heading: '컨셉 디벨롭',
+        body: '곡 분석부터 무드보드까지. 비주얼 톤을 먼저 결정해야 후반 일관성이 잡힙니다.',
+        items: [
+          ['곡 분석',       'BPM·구조·가사·감정선 정리. Gemini로 가사 분석·테마 추출.'],
+          ['컨셉아트',     'Midjourney / Flux로 키비주얼 5~10장 생성. 클라이언트 컨펌용.'],
+          ['레퍼런스',     'Vimeo Staff Picks·Pinterest + Runway Search Reference.'],
+          ['무드보드',     'Flux 키비주얼 + Figma 보드로 톤·색·구도 정리.'],
+        ],
+      },
+      {
+        heading: '시놉시스 / 컷 리스트',
+        body: '곡을 4~8개 씬으로 분할하고 씬당 컷 리스트 작성. AI 통합의 핵심 출발점.',
+        steps: [
+          '곡 구조에 맞춰 씬 분할 (인트로 / 벌스 / 코러스 / 브릿지 / 아웃트로)',
+          '각 씬마다 컷 번호·길이·샷 타입·내용 기재',
+          'VFX 들어갈 컷 표시 (#vfx 태그)',
+          '본인 앱 Prompts 탭에 컷별 프롬프트 미리 저장',
+        ],
+        examples: [
+          '씬 1 — 인트로 (0:00~0:15) · 8 컷',
+          '컷 1.1: 와이드 도시 야경 (3초) #vfx',
+          '컷 1.2: 캐릭터 실루엣 클로즈업 (2초) #real',
+          '컷 1.3: 네온 사인 인서트 (1초) #vfx',
+        ],
+      },
+      {
+        heading: '스토리보드 / Pre-viz',
+        body: '컷별 키프레임 + 움직임 프리뷰 영상. 촬영 전 합의용이라 정밀도는 불필요.',
+        items: [
+          ['키비주얼',     'Flux / Midjourney로 컷별 첫 프레임 정지 이미지.'],
+          ['끝 프레임',    '같은 캐릭터 끝 자세 (Midjourney --cref 활용).'],
+          ['움직임 프리뷰', 'Wan 1.3B 로컬로 5초 저화질 영상 — 5060 8GB에서 5분/컷.'],
+          ['클라이언트 컨펌', '위 영상으로 PPT 만들어 촬영 전 컷 단위 합의.'],
+        ],
+      },
+      {
+        heading: '플래닝 체크리스트',
+        body: '실촬 가능한 건 무조건 실촬. 비현실·위험·예산 안 맞는 것만 AI로.',
+        items: [
+          ['VFX vs 실촬',    '컷마다 실촬 가능성 판단 후 분류. 실촬 디테일이 압승.'],
+          ['로케이션',       '실촬 장소 헌팅. 합성 들어갈 컷은 배경 정보 미리 수집.'],
+          ['캐스팅 / 의상',  '캐릭터 레퍼런스 이미지 확보 → 후반 AI 인서트에 활용.'],
+          ['그린스크린',     '합성 컷 식별 → 그린/블루 배경 촬영 계획.'],
+          ['추적 마커',      '카메라 트래킹 필요한 컷에 마커 위치 결정.'],
+        ],
+      },
+    ],
+  },
+
+  production: {
+    title: '02. Production',
+    subtitle: '촬영 단계 (1~3일). AI 활용은 거의 없음 — VFX 합성을 염두에 둔 촬영이 핵심.',
+    sections: [
+      {
+        heading: '촬영 당일 흐름',
+        body: '실촬은 사람의 영역. 단, 후반에 합성할 컷은 더 많이 찍어두기.',
+        steps: [
+          '콜타임 / 메이크업 (오전)',
+          '블로킹 리허설 — 카메라 움직임 정확히 합의',
+          '각 컷 3~5테이크 (VFX 합성 컷은 5~8테이크)',
+          '데일리 — 촬영본 SSD에 즉시 2부 백업',
+        ],
+      },
+      {
+        heading: 'VFX 합성 컷 촬영 팁',
+        body: '후반 합성을 살리려면 촬영 단계에서 미리 챙길 게 있습니다.',
+        items: [
+          ['클린 플레이트',   '배우 없이 배경만 30초 더 촬영. 합성·페인트아웃의 기준.'],
+          ['조명 방향 메모',  'AI 에셋 그림자·하이라이트 매칭에 필수.'],
+          ['컬러차트 촬영',   '씬 시작에 24색 차트 1초 촬영 → 컬러 매칭 기준.'],
+          ['멀티 앵글',      '같은 액션을 2개 이상 앵글로 → 편집 자유도 확보.'],
+          ['추적 마커',      '모션 트래킹 필요한 컷에 노란/녹색 점 마커. 후반 제거 가능.'],
+        ],
+      },
+      {
+        heading: '촬영 후 데이터 정리',
+        body: '백업 안 한 데이터는 없는 데이터. 즉시 두 곳에 복사.',
+        items: [
+          ['SSD 1 (작업용)',  '노트북 또는 워크스테이션 직접 연결.'],
+          ['SSD 2 (백업)',    '금고 / 별도 클라우드 (Backblaze, iCloud).'],
+          ['원본 카드',       '1주일 보관 후 포맷. 후반 중 사고 대비.'],
+          ['폴더 구조',       'YYYYMMDD_씬번호_샷번호 형식 통일.'],
+        ],
+      },
+    ],
+  },
+
+  offline: {
+    title: '03. Offline Edit',
+    subtitle: '가편집 단계 (1~2주). 음악에 맞춰 컷 배열. AI 들어갈 자리는 검은 화면으로 잡아둠.',
+    sections: [
+      {
+        heading: 'Ingest / 프록시 / 백업',
+        body: '본격 편집 전 데이터 정리. 프록시는 노트북 작업의 필수.',
+        steps: [
+          '모든 raw 파일 SSD에 정리 (씬/컷 폴더 구조)',
+          'DaVinci에서 1/4 해상도 프록시 자동 생성',
+          '본인 앱 Archive 탭에 폴더 연결 → 썸네일 관리',
+          '편집 프로젝트 클라우드 백업 (DaVinci Project Library)',
+        ],
+      },
+      {
+        heading: '편집 흐름 V1 → Picture Lock',
+        body: '버전 관리로 작업하고 매 단계 클라이언트 컨펌. AI는 Picture Lock 이후 투입.',
+        steps: [
+          '음악 import → 비트 마커 찍기 (DaVinci M 키)',
+          '각 컷 OK 테이크 선별 (5테이크 중 베스트 1개)',
+          'V1 러프컷 — 컷 위치 대충, 빈 컷은 검은 화면 + 메모 ("AI 배경 들어갈 자리")',
+          'V2 타이트컷 — 프레임 단위로 다듬기, 컷 길이 확정',
+          'V3 컨펌 — 감독·아티스트 피드백 반영',
+          'V4 Picture Lock — 이 시점에 VFX 작업 시작',
+        ],
+      },
+      {
+        heading: 'AI 자동화 도구',
+        body: '편집 시간 절약하는 도구들. 가편집에만 쓰고 최종 결정은 사람이.',
+        items: [
+          ['Premiere AutoCut',      '비트 감지 → 자동 컷 분할. 러프컷에 유용.'],
+          ['DaVinci Smart Reframe', '16:9 → 9:16 자동 리프레이밍. Reels용 마스터 생성.'],
+          ['Auto Caption',          '가사 자막 자동 생성 → 수정.'],
+          ['Scene Detect',          '긴 클립에서 컷 포인트 자동 감지.'],
+        ],
+      },
+    ],
+  },
+
+  vfx: {
+    title: '04. VFX / Composite — AI 메인 투입',
+    subtitle: '후반작업의 핵심 (1~3주). 편집 락된 V4가 기준점. 본인 앱이 가장 빛나는 단계.',
+    sections: [
+      {
+        heading: 'VFX 컷 리스트 추출',
+        body: 'Picture Lock된 편집본에서 VFX 컷을 뽑아 작업 큐 작성.',
+        steps: [
+          '편집본 보면서 #vfx 표시된 컷 리스트화',
+          '컷별 작업 분류: 에셋 합성 / 배경 교체 / 인서트 / 트랜지션',
+          '각 컷의 한국어 설명을 Studio 탭에 입력 → 영어 프롬프트 생성',
+          '결과를 Prompts 탭에 저장 (씬·컷 태그 포함)',
+          'Archive 탭 폴더에 생성 영상 저장 후 메모',
+        ],
+        examples: [
+          '씬 2 컷 5: 옥상 배경을 야간 도쿄로 교체 (3초)',
+          '씬 3 컷 2: 폭발 합성 (1초)',
+          '씬 4 컷 8: 캐릭터 뒤로 안개 추가 (4초)',
+          '씬 6 컷 3: 신호등 인서트 (1초)',
+        ],
+      },
+      {
+        heading: '컷별 AI 분기',
+        body: '컷 성격에 따라 다른 AI 모델·경로 사용. 비용 최적화의 핵심.',
+        items: [
+          ['단순 에셋 (연기·신호등·파편)', 'Wan 1.3B 로컬 (무료) → After Effects Add 블렌드'],
+          ['배경 플레이트 (도시·자연)',     'Veo Fast 5초 ($0.75) → Nuke 매트 페인팅'],
+          ['캐릭터 인서트 (얼굴·손)',      'Veo Standard ($4) — 디테일 필수'],
+          ['컷 사이 트랜지션',            'Wan FLF2V (첫·끝 프레임 보간)'],
+          ['정지 컷 (포스터·타이틀)',     'Flux / Midjourney'],
+        ],
+      },
+      {
+        heading: '합성 체크리스트 (AE / Nuke)',
+        body: 'AI 영상을 실촬에 자연스럽게 녹이는 6단계.',
+        items: [
+          ['1. 매트 / 로토',     '합성 대상 영역 마스킹 + 카메라 트래킹.'],
+          ['2. 클린업',         '워터마크·와이어·로고 제거 (Patch Replacer / Content-Aware Fill).'],
+          ['3. AI 에셋 합성',    'Add / Screen 블렌드 모드, 마스킹 정리.'],
+          ['4. 그레인 매칭',     'AI의 부드러움 → 실촬 노이즈에 맞춰 그레인 추가.'],
+          ['5. 조명 매칭',       '실촬 광원 방향에 AI 그림자·하이라이트 맞추기.'],
+          ['6. 색온도 매칭',     '1차 그레이드로 톤 통일 (다음 단계 위해).'],
+        ],
+      },
+      {
+        heading: 'AI 영상이 어색해 보이는 4가지 원인',
+        body: '대부분 이 4가지에서 티가 납니다. 합성 단계에서 의도적으로 매칭.',
+        items: [
+          ['너무 깨끗한 노이즈', '실촬엔 항상 노이즈가 있음. AE Add Grain으로 매칭.'],
+          ['조명 방향 불일치',  '실촬 광원과 AI 그림자 방향 다르면 즉시 들킴.'],
+          ['모션 블러 차이',    'AI 영상은 모션 블러 약함. CC Force Motion Blur로 추가.'],
+          ['색온도 차이',       '1차 매칭 후 2차 그레이드에서 시퀀스 전체 통일.'],
+        ],
+      },
+      {
+        heading: '디테일 살리는 4가지 핵심 (이게 결정타)',
+        body: 'AI 티 안 나는 결과물의 비결. 모든 컷에 적용.',
+        items: [
+          ['기준 프레임',       'Flux/MJ로 첫 프레임 만들고 → AI 영상은 I2V로 그 프레임에서 시작.'],
+          ['캐릭터 고정',       '같은 시드 / 레퍼런스 이미지로 씬 간 캐릭터 일관성 유지.'],
+          ['2단 그레이드',      '1차 톤 매칭 후 합성 → 합성 끝나면 시퀀스 전체 2차 그레이드.'],
+          ['실촬 디테일 입히기', '그레인·디포커스·노이즈를 AI 영상에 추가해 실촬과 톤 통일.'],
+        ],
+      },
+    ],
+  },
+
+  grade: {
+    title: '05. Color Grade',
+    subtitle: '컬러그레이딩 (3~5일). AI 컷과 실촬 톤을 통일하는 마지막 안전망.',
+    sections: [
+      {
+        heading: 'DaVinci 컬러 페이지 워크플로우',
+        body: '5단계로 마감. AI 컷은 1단계에서 별도로 정상화 후 합류.',
+        steps: [
+          'Normalize — 모든 컷 베이스라인 (노출·화이트밸런스) 맞춤',
+          'Primary Grade — 전체 룩 결정 (teal-orange, bleach bypass, Kodak 등)',
+          'Secondary Grade — 부분 마스킹 (피부톤, 하늘, 의상 색)',
+          'Trim Pass — 컷별 미세 조정',
+          'LUT 적용 → 익스포트 (씬별 또는 전체)',
+        ],
+      },
+      {
+        heading: 'AI 컷 vs 실촬 컷 톤 매칭',
+        body: 'AI 컷이 들킬 가능성이 가장 높은 곳. 의도적으로 매칭 작업.',
+        items: [
+          ['Match Color 노드',  'DaVinci에서 AI 컷을 인접 실촬 컷 기준으로 자동 매칭.'],
+          ['Film Grain 통일',   '시퀀스 전체에 동일 그레인 적용 (Filmic LUT + Grain).'],
+          ['Halation 추가',     '하이라이트 글로우 통일 → 필름 느낌 + AI 부드러움 가림.'],
+          ['Vignette 통일',     '약한 비네팅으로 프레임 가장자리 톤 일치.'],
+        ],
+      },
+    ],
+  },
+
+  delivery: {
+    title: '06. Delivery',
+    subtitle: '마감·송출 (1~3일). 플랫폼별 마스터링 + AI 사용 표기 검토.',
+    sections: [
+      {
+        heading: '플랫폼별 마스터 출력',
+        body: 'DaVinci Deliver 페이지 또는 Adobe Media Encoder로 일괄 출력.',
+        items: [
+          ['YouTube 메인',     '4K H.264 / H.265, 24fps, 16:9, -14 LUFS'],
+          ['Instagram Reels',  '1080p H.264, 30fps, 9:16, -14 LUFS'],
+          ['TikTok',          '1080p H.264, 30fps, 9:16, -14 LUFS'],
+          ['Spotify Canvas',   '720p 8초 루프, 9:16, 무음 또는 곡 일부'],
+        ],
+      },
+      {
+        heading: '메타데이터 / 크레딧',
+        body: '검색 노출과 권리 명시. AI 사용 표기는 한국 송출 시 권장.',
+        items: [
+          ['제목 / 설명',      '곡명·아티스트·릴리즈 정보. 키워드 5~10개 자연스럽게.'],
+          ['크레딧',          '감독·촬영·편집·VFX·컬러 — 본인이 다 했다면 한 줄 통합.'],
+          ['AI 사용 표기',    '"AI 일부 활용" 또는 도구명 명시 (Veo·Wan·Midjourney 등).'],
+          ['Vertex 영수증',   'API 사용 명세 백업 — 분쟁 시 합법 사용 증빙.'],
+        ],
+      },
+      {
+        heading: 'AI 표기 의무 (한국 기준)',
+        body: '한국 AI 기본법(2025 시행)과 방통위 가이드라인을 따릅니다. 광고·방송용은 표기 의무, 일반 뮤비도 권장.',
       },
     ],
   },
