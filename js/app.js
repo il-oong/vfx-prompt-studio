@@ -7,7 +7,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 (function () {
-  const TABS = ['studio', 'prompts', 'archive', 'guide'];
+  const TABS = ['studio', 'concept', 'composite', 'deliver', 'prompts', 'archive', 'guide'];
 
   const PROJECT_COLORS = [
     'linear-gradient(135deg,#5b5bd6,#c47b2c)',
@@ -475,6 +475,15 @@
     if (state.tab === 'studio') {
       await window.Bot.open(p?.id);
       window.Bot.render(host);
+    } else if (state.tab === 'concept') {
+      await window.Concept.open(p?.id);
+      window.Concept.render(host);
+    } else if (state.tab === 'composite') {
+      await window.Composite.open(p?.id);
+      window.Composite.render(host);
+    } else if (state.tab === 'deliver') {
+      await window.Deliver.open(p?.id);
+      window.Deliver.render(host);
     } else if (state.tab === 'prompts') {
       await window.Prompts.open(p?.id);
       window.Prompts.render(host);
@@ -568,9 +577,12 @@
         setTimeout(() => $('#composer-input')?.focus(), 60);
       }
       if (e.key === '1') switchTab('studio');
-      if (e.key === '2') switchTab('prompts');
-      if (e.key === '3') switchTab('archive');
-      if (e.key === '4') switchTab('guide');
+      if (e.key === '2') switchTab('concept');
+      if (e.key === '3') switchTab('composite');
+      if (e.key === '4') switchTab('deliver');
+      if (e.key === '5') switchTab('prompts');
+      if (e.key === '6') switchTab('archive');
+      if (e.key === '7') switchTab('guide');
     });
   }
 
