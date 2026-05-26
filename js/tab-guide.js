@@ -50,6 +50,10 @@
     { id: 'mv-vfx',              label: '04. VFX / Composite', group: 'MV WORKFLOW' },
     { id: 'mv-grade',            label: '05. Color Grade',    group: 'MV WORKFLOW' },
     { id: 'mv-delivery',         label: '06. Delivery',       group: 'MV WORKFLOW' },
+    { id: 'comfyui-intro',       label: '소개 & 설치',         group: 'COMFYUI' },
+    { id: 'comfyui-nodes',       label: '핵심 노드 가이드',    group: 'COMFYUI' },
+    { id: 'comfyui-composite',   label: '가구 합성 워크플로우', group: 'COMFYUI' },
+    { id: 'comfyui-tips',        label: '완성도 팁',           group: 'COMFYUI' },
   ];
 
   function esc(s) {
@@ -1031,6 +1035,10 @@
     if (currentSection === 'mv-vfx')              return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.vfx, 'MV Workflow');
     if (currentSection === 'mv-grade')            return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.grade, 'MV Workflow');
     if (currentSection === 'mv-delivery')         return renderRunwaySection(window.GUIDE_MV_WORKFLOW?.delivery, 'MV Workflow');
+    if (currentSection === 'comfyui-intro')       return renderRunwaySection(window.GUIDE_COMFYUI?.intro, 'ComfyUI');
+    if (currentSection === 'comfyui-nodes')       return renderRunwaySection(window.GUIDE_COMFYUI?.nodes, 'ComfyUI');
+    if (currentSection === 'comfyui-composite')   return renderRunwaySection(window.GUIDE_COMFYUI?.composite, 'ComfyUI');
+    if (currentSection === 'comfyui-tips')        return renderRunwaySection(window.GUIDE_COMFYUI?.tips, 'ComfyUI');
     return '';
   }
 

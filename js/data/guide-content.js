@@ -654,6 +654,267 @@ window.GUIDE_MV_WORKFLOW = {
   },
 };
 
+window.GUIDE_COMFYUI = {
+  intro: {
+    title: 'ComfyUI 소개',
+    subtitle: 'VFX 합성을 위한 노드 기반 AI 워크플로우 툴. Silence & Sculpture 같은 가구 비주얼 작업에 최적화.',
+    sections: [
+      {
+        heading: 'ComfyUI가 뭔가요?',
+        body: '노드(박스)를 연결해서 AI 이미지 생성·합성 파이프라인을 직접 설계하는 오픈소스 툴입니다. 버튼 하나로 되는 대신, 각 단계를 내가 제어합니다.',
+        items: [
+          ['노드 기반', '각 기능이 노드(박스)로 분리됨. 연결 순서가 곧 워크플로우.'],
+          ['AUTOMATIC1111 vs ComfyUI', 'A1111은 UI가 쉽지만 자동화 한계. ComfyUI는 복잡하지만 배치·합성에 강함.'],
+          ['무료 오픈소스', 'GPU만 있으면 무료. NVIDIA RTX 3060 이상 권장 (8GB VRAM).'],
+          ['워크플로우 JSON', '만든 파이프라인을 JSON으로 저장·공유 가능. 커뮤니티 공유 워크플로우를 불러와서 쓸 수 있음.'],
+        ],
+      },
+      {
+        heading: 'VFX 합성에 ComfyUI 쓰는 이유',
+        body: 'After Effects나 Photoshop 대신 ComfyUI를 쓰는 진짜 이유입니다.',
+        items: [
+          ['AI 기반 자동 합성', '수동 마스킹/키잉 시간을 10분의 1로 단축. AI가 자동으로 배경 분리.'],
+          ['배치 작업', '100장 이미지를 같은 워크플로우로 한번에 처리 가능.'],
+          ['스타일 일관성', 'IPAdapter로 참조 이미지의 스타일을 유지하며 생성.'],
+          ['공간감 유지', 'ControlNet Depth로 3D 공간 구조를 분석해 합성 시 왜곡 방지.'],
+        ],
+      },
+      {
+        heading: '설치 & 시작',
+        body: '처음 설치하는 경우 이 순서로 진행하세요. 총 소요 시간: 1~2시간.',
+        steps: [
+          'Python 3.10+ 설치 (python.org)',
+          'Git으로 ComfyUI 클론: git clone https://github.com/comfyanonymous/ComfyUI',
+          'requirements.txt 설치: pip install -r requirements.txt',
+          'CUDA가 있다면 torch GPU 버전으로 재설치',
+          'python main.py 실행 → 브라우저에서 127.0.0.1:8188 접속',
+          'ComfyUI Manager 설치 (커스텀 노드 관리 필수)',
+        ],
+      },
+      {
+        heading: '학습 로드맵 — 일주일 완성',
+        body: '이 순서로 익히면 일주일 안에 가구 합성 작업이 가능합니다.',
+        items: [
+          ['Day 1', '기본 T2I (텍스트→이미지) 워크플로우 완성. KSampler, CLIP, VAE 노드 이해.'],
+          ['Day 2', 'Inpaint + ControlNet으로 특정 영역 오브젝트 추가/수정.'],
+          ['Day 3', 'Rembg/SAM으로 배경 분리 + IPAdapter로 스타일 일관성.'],
+          ['Day 4+', '실전 가구 합성 워크플로우 조립 & 배치 처리.'],
+        ],
+      },
+    ],
+  },
+
+  nodes: {
+    title: '핵심 노드 가이드',
+    subtitle: '가구 합성 워크플로우에서 반드시 알아야 할 5가지 노드 그룹입니다.',
+    sections: [
+      {
+        heading: 'Inpaint — 영역 지정 생성',
+        body: '이미지의 특정 영역만 새로 생성하거나 교체합니다. 가구를 넣을 위치를 마스크로 지정하고 프롬프트로 내용을 채웁니다.',
+        items: [
+          ['마스크 방법', 'LoadImage → MaskEditor로 브러시로 영역 선택. 흰색 영역이 생성 대상.'],
+          ['Denoising Strength', '0.5~0.7 권장. 1.0은 완전히 새로 생성, 0.3은 기존 내용 유지.'],
+          ['Inpaint 전용 모델', '일반 SD 모델보다 Inpaint 전용 모델 사용 시 품질 향상. realistic-vision-inpaint 권장.'],
+          ['컨텍스트 확장', '"only masked" 옵션 대신 전체 이미지를 컨텍스트로 주면 주변과 더 자연스럽게 합성됨.'],
+        ],
+        examples: [
+          '빈 주방에 가구 추가: 가구 놓을 자리를 마스크 → "matte black cabinet, modern minimal" 프롬프트',
+          '기존 가구 교체: 현재 가구를 마스크 → 원하는 스타일 프롬프트로 교체',
+          '바닥 재질 변경: 바닥 영역을 마스크 → "white oak herringbone floor" 등 재질 프롬프트',
+        ],
+      },
+      {
+        heading: 'IPAdapter — 스타일 일관성 유지',
+        body: '참조 이미지의 색감, 재질, 분위기를 새로 생성되는 이미지에 이식합니다. 가구 브랜드의 시각적 일관성 유지에 필수.',
+        items: [
+          ['기본 연결', 'IPAdapterModelLoader → IPAdapter 노드 → KSampler. 참조 이미지를 ClipVisionEncode에 연결.'],
+          ['Weight 설정', '0.6~0.8 권장. 1.0은 참조 이미지와 너무 유사해짐. 0.4 이하는 효과 미미.'],
+          ['IPAdapter Plus', '기본 IPAdapter보다 세밀한 스타일 이식. 얼굴·질감 보존에 강함.'],
+          ['FaceID 변형', '제품 로고·특정 텍스처를 일관되게 유지할 때 FaceID 모델 활용 가능.'],
+        ],
+        examples: [
+          '브랜드 스타일 유지: 기존 제품 이미지를 참조 → 새 환경에서도 같은 마감·톤 유지',
+          '공간 분위기 복사: 인테리어 레퍼런스를 참조 → 생성 이미지에 동일 분위기 적용',
+        ],
+      },
+      {
+        heading: 'ControlNet (Depth / Normal) — 공간감 유지',
+        body: '실사 사진의 3D 공간 구조를 분석해서 합성 시 원근감이 무너지지 않도록 합니다.',
+        items: [
+          ['Depth 맵', 'MiDaS Depth Estimation으로 공간의 깊이 정보 추출. 가구가 공간에 올바르게 배치됨.'],
+          ['Normal 맵', '표면 방향 정보. 조명 반응을 더 정확하게 맞출 때 사용.'],
+          ['ControlNet 강도', 'Depth는 0.7~0.9 권장. 너무 높으면 뻣뻣해짐.'],
+          ['Lineart / Canny', '가구 윤곽선을 유지하면서 재질만 바꿀 때 사용. 형태 변형 없이 스타일 교체.'],
+        ],
+        steps: [
+          '실사 공간 이미지를 DepthEstimator 노드에 입력',
+          '출력된 Depth 맵을 ControlNet Apply 노드에 연결',
+          'ControlNet 모델: control_v11f1p_sd15_depth.pth 로드',
+          'KSampler에 conditioning과 함께 연결',
+          'Depth 맵이 공간 구조를 올바르게 읽는지 미리보기로 확인',
+        ],
+      },
+      {
+        heading: 'Rembg / SAM — 배경 분리',
+        body: '합성할 가구나 오브젝트의 배경을 자동으로 제거합니다. 수동 마스킹 없이 깔끔하게 오브젝트만 분리.',
+        items: [
+          ['Rembg', 'U2Net 모델 기반 배경 제거. 단순한 배경엔 빠르고 정확. ComfyUI-rembg 익스텐션으로 설치.'],
+          ['SAM (Segment Anything)', 'Meta의 SAM 모델. 복잡한 배경도 클릭 한 번으로 정밀 분리. 느리지만 정확.'],
+          ['출력 활용', '분리된 이미지(RGBA) → LoadImage로 다시 불러와서 Inpaint/합성에 활용.'],
+          ['엣지 정리', '배경 제거 후 엣지가 거칠면 GrowMask + Feather로 자연스럽게 다듬기.'],
+        ],
+        examples: [
+          '가구 이미지 배경 제거: 제품 사진 → Rembg → 투명 배경 가구만 추출',
+          '복잡한 의자 분리: 다리 사이 배경이 복잡하면 SAM + 클릭 선택으로 정밀 마스킹',
+        ],
+      },
+      {
+        heading: 'ImageComposite / Blend — 레이어 합성',
+        body: '분리된 가구 이미지를 공간 이미지 위에 자연스럽게 올립니다. 블렌드 모드와 투명도 조절로 마감.',
+        items: [
+          ['ImageComposite 노드', '전경(가구) + 배경(공간) + 마스크 → 합성. x/y 좌표로 위치 조절.'],
+          ['Blend 모드', 'Normal: 일반 합성. Multiply: 그림자 강조. Screen: 빛 효과. Overlay: 색감 믹싱.'],
+          ['그림자 추가', '합성 가구 아래에 Gaussian Blur 처리한 어두운 타원 → Multiply로 그림자 표현.'],
+          ['색온도 매칭', 'Color Correct 노드로 가구 색온도를 공간 사진에 맞게 보정.'],
+        ],
+      },
+    ],
+  },
+
+  composite: {
+    title: '가구 합성 실전 워크플로우',
+    subtitle: 'Silence & Sculpture 같은 가구 비주얼 작업을 ComfyUI로 완성하는 단계별 실전 가이드.',
+    sections: [
+      {
+        heading: '전체 파이프라인',
+        body: '실사 공간에 AI 생성 가구를 합성하는 전체 흐름입니다. 5단계로 나뉩니다.',
+        steps: [
+          'Step 1 — 재료 준비: 빈 공간 사진 + 합성할 가구 레퍼런스 이미지',
+          'Step 2 — 공간 분석: ControlNet Depth로 공간 구조 파악',
+          'Step 3 — 가구 생성: Inpaint + IPAdapter로 공간에 맞는 가구 생성',
+          'Step 4 — 합성 & 마스킹: Rembg로 배경 제거 후 ImageComposite로 합성',
+          'Step 5 — 마감: 그림자 추가, 색온도 맞추기, 최종 보정',
+        ],
+      },
+      {
+        heading: 'Step 1 — 재료 준비',
+        body: '좋은 합성 결과는 좋은 재료에서 시작됩니다. 이 기준으로 사진을 준비하세요.',
+        items: [
+          ['공간 사진', '가구를 넣을 빈 방/공간. 조명 방향이 명확하고 바닥-벽 경계선이 보이는 각도 권장.'],
+          ['가구 레퍼런스', '합성하고 싶은 가구의 이미지. 여러 각도 있으면 좋음. IPAdapter 참조용.'],
+          ['해상도', '최소 1024×1024. 합성 후 다운스케일하는 방식으로 작업하면 품질 유지.'],
+          ['조명 메모', '공간 사진의 빛이 어느 방향에서 오는지 메모. 합성 가구 그림자 방향에 사용.'],
+        ],
+      },
+      {
+        heading: 'Step 2 — 공간 분석 (ControlNet Depth)',
+        body: '공간의 3D 구조를 읽어서 가구가 공간에 자연스럽게 놓이게 합니다.',
+        steps: [
+          'LoadImage 노드에 공간 사진 로드',
+          'DepthEstimator 노드 연결 (DPT_Large 모델 권장)',
+          'Depth 맵 미리보기로 공간 구조 확인 (가까울수록 밝게, 멀수록 어둡게)',
+          'ControlNet Apply 노드에 Depth 맵 연결 (강도: 0.75)',
+          'control_v11f1p_sd15_depth.pth 모델 로드',
+        ],
+        examples: [
+          'Depth 맵에서 바닥이 밝고 벽이 어두우면 정상. 반대라면 Invert 노드 추가.',
+          '가구를 놓을 바닥 영역이 Depth 맵에서 균일한 톤이어야 합성 시 안정적.',
+        ],
+      },
+      {
+        heading: 'Step 3 — 가구 생성 (Inpaint + IPAdapter)',
+        body: '공간 사진 위에 가구를 직접 생성합니다. ControlNet이 공간 구조를, IPAdapter가 스타일을 잡아줍니다.',
+        steps: [
+          'MaskEditor로 가구를 놓을 영역에 마스크 그리기 (흰색 = 생성 영역)',
+          'IPAdapter 노드에 가구 레퍼런스 이미지 연결 (Weight: 0.7)',
+          'Inpaint 전용 모델 로드 (실사 작업: realistic-vision-inpaint 권장)',
+          '프롬프트 작성: 가구 종류 + 재질 + 조명 방향 + photorealistic',
+          'Denoising Strength: 0.65~0.75 (너무 낮으면 기존 이미지가 남음)',
+          '5~10회 생성 후 가장 자연스러운 결과 선택',
+        ],
+        examples: [
+          '"matte black sideboard, solid oak legs, minimal Japanese design, soft directional light from left, photorealistic"',
+          '"white marble dining table, brushed steel base, morning light, photorealistic, 8k"',
+          '"walnut lounge chair, bouclé upholstery, warm tungsten interior lighting, photorealistic"',
+        ],
+      },
+      {
+        heading: 'Step 4 — 합성 & 마스킹',
+        body: '생성된 가구를 원본 공간에 붙여넣는 단계입니다. 엣지를 자연스럽게 처리하는 게 핵심.',
+        steps: [
+          '생성된 가구 이미지를 Rembg 노드로 배경 제거 (RGBA 출력)',
+          '엣지 확인: 거친 부분은 GrowMask + Feather로 부드럽게',
+          'ImageComposite 노드에 배경(원본 공간) + 전경(가구) + 마스크 연결',
+          'x/y 좌표와 Scale로 가구 위치·크기 조절',
+          '바닥 반사 있는 공간이면 Flip + Opacity 20~30%로 반사광 표현',
+        ],
+      },
+      {
+        heading: 'Step 5 — 마감 보정',
+        body: '합성이 자연스럽게 보이려면 마지막 보정이 결정적입니다.',
+        items: [
+          ['그림자', '타원형 마스크 → Gaussian Blur 30~50px → Multiply 블렌드, Opacity 40~60%. 빛 방향에 맞춰 오프셋.'],
+          ['색온도 매칭', 'Color Correct 노드로 합성 가구의 색온도를 공간 사진과 맞춤. 특히 화이트밸런스.'],
+          ['노이즈 매칭', '공간 사진에 노이즈가 있다면 합성 가구에도 같은 강도의 Add Noise 적용.'],
+          ['최종 LUT', '전체 이미지에 동일한 LUT/색보정 적용해서 공간-가구 톤 통일. DaVinci 또는 Photoshop.'],
+        ],
+      },
+    ],
+  },
+
+  tips: {
+    title: '완성도를 높이는 팁',
+    subtitle: '합성이 어색해 보이는 원인과 해결법. 이 4가지만 잡으면 자연스러운 합성 완성.',
+    sections: [
+      {
+        heading: '합성이 들키는 4가지 원인',
+        body: '대부분의 어색한 합성은 이 4가지 중 하나 이상이 어긋나서 발생합니다.',
+        items: [
+          ['조명 방향 불일치', '공간 사진의 그림자와 생성 가구의 그림자 방향이 다르면 즉시 들킴. 생성 프롬프트에 조명 방향 명시 필수.'],
+          ['노이즈/질감 차이', '공간 사진은 카메라 노이즈가 있지만 AI 생성 이미지는 너무 깨끗. Add Noise로 동일화.'],
+          ['색온도 불일치', '실내 사진은 따뜻하고 AI 생성은 차가운 경우가 많음. Color Correct로 매칭.'],
+          ['엣지 처리 미흡', '가구 엣지가 너무 선명하면 배경과 분리되어 보임. Feather 2~5px 기본 적용.'],
+        ],
+      },
+      {
+        heading: '조명 매칭 방법',
+        body: '조명 방향을 맞추는 것이 자연스러운 합성의 핵심입니다.',
+        steps: [
+          '공간 사진에서 그림자 방향 파악 (어느 방향으로 그림자가 드리워지는지)',
+          '프롬프트에 조명 방향 명시: "light from top-left", "warm side lighting from right"',
+          '생성 후 가구의 하이라이트·그림자 방향이 공간과 일치하는지 확인',
+          '불일치 시 생성 프롬프트 조정해서 재생성 (조명 관련 키워드 수정)',
+          '미세 조정은 Photoshop에서 Dodge/Burn 툴로 수동 보정',
+        ],
+      },
+      {
+        heading: '배치 처리 팁',
+        body: '같은 공간에 여러 가구 옵션을 만들 때 배치 처리로 시간을 절약합니다.',
+        items: [
+          ['워크플로우 복사', 'ComfyUI에서 같은 워크플로우를 복제하고 프롬프트만 변경해서 병렬 실행.'],
+          ['Queue Prompt', '여러 프롬프트를 큐에 넣어두면 순차적으로 자동 처리됨. 자리 비워도 OK.'],
+          ['Seed 변경', '같은 프롬프트로 Seed만 바꿔서 10~20개 결과 생성 후 최고 선택.'],
+          ['WAS Node Suite', '설치하면 폴더 내 이미지 전체를 일괄 처리하는 배치 노드 사용 가능.'],
+        ],
+        examples: [
+          '같은 주방 공간에 가구 색상 5가지 옵션 생성: 프롬프트에서 색상 키워드만 교체',
+          '클라이언트 A/B 비교: 같은 공간에 2가지 스타일 가구를 배치 생성',
+        ],
+      },
+      {
+        heading: '워크플로우 JSON 공유',
+        body: 'ComfyUI 워크플로우를 JSON으로 저장해서 재사용하거나 팀과 공유합니다.',
+        items: [
+          ['저장', '캔버스 우클릭 → Save (Ctrl+S) → JSON 파일로 저장.'],
+          ['불러오기', '저장된 JSON을 ComfyUI에 드래그앤드롭 또는 Load 버튼으로 불러오기.'],
+          ['커뮤니티 워크플로우', 'civitai.com, ComfyUI Wiki에 검증된 워크플로우 공유됨. 그대로 불러와서 쓸 수 있음.'],
+          ['버전 관리', '작업 완료된 워크플로우는 날짜+프로젝트명으로 파일 저장. 롤백 가능.'],
+        ],
+      },
+    ],
+  },
+};
+
 window.GUIDE_TIPS = [
   {
     icon: '✦', color: 'accent',
