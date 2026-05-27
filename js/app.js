@@ -7,7 +7,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 (function () {
-  const TABS = ['studio', 'concept', 'composite', 'deliver', 'prompts', 'archive', 'guide'];
+  const TABS = ['studio', 'concept', 'composite', 'deliver', 'prompts', 'archive', 'guide', 'travel'];
 
   const PROJECT_COLORS = [
     'linear-gradient(135deg,#5b5bd6,#c47b2c)',
@@ -492,6 +492,8 @@
       window.Archive.render(host);
     } else if (state.tab === 'guide') {
       window.Guide.render(host);
+    } else if (state.tab === 'travel') {
+      window.Travel.render(host);
     }
   }
 
@@ -583,6 +585,7 @@
       if (e.key === '5') switchTab('prompts');
       if (e.key === '6') switchTab('archive');
       if (e.key === '7') switchTab('guide');
+      if (e.key === '8') switchTab('travel');
     });
   }
 
